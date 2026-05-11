@@ -1396,33 +1396,68 @@ function exportCSV() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = `servisni_historie_${ts}.csv`; a.click(); setTimeout(()=> URL.revokeObjectURL(url), 0);
     }
+function normalizeTS(r) {
+  return (r.date || "") + " " + (r.time || "");
+}
 
-function computeOutOfServiceDetail() {
-  const map = new Map();
-  // seřadit od nejnovějšího
-  const sorted = [...servis].sort((a, b) => {
-    const ad = a.date + a.time;
-    const bd = b.date + b.time;
-    return bd.localeCompare(ad);
-  });
-  for (const r of sorted) {
-    if (!r.serial) continue;
-    if (map.has(r.serial)) continue;  // máme už novější
-    // ← OPRAVA: zapiš jen pokud back není null
-    if (r.back !== null) {
-      map.set(r.serial, r);
-    }
-    // pokud r.back === null, přeskočíme a hledáme starší záznam
+function getLatestMaintenanceState(serial) {
+  const rows = [...servis]
+    .filter(r => r.serial === serial)
+    .sort((a, b) => normalizeTS(b).localeCompare(normalizeTS(a)));
+
+  for (const r of rows) {
+    if (r.back === true || r.back === false) return r;
   }
+  return null;
+}
+function computeOutOfServiceDetail() {
+  const rows = [...servis]
+    .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial)
+    .sort((a, b) => normalizeTS(b).localeCompare(normalizeTS(a)));
+
+  const map = new Map();
+
+  for (const r of rows) {
+    if (map.has(r.serial)) continue;
+
+    const latest = getLatestMaintenanceState(r.serial);
+    if (!latest) continue;
+    if (latest.back !== false) continue;
+
+    const episode = getMaintenanceEpisodesForSerial(r.serial);
+    const first = episode[episode.length - 1] || latest;
+
+    map.set(r.serial, {
+      serial: r.serial,
+      type: r.type,
+      tech: latest.tech || "",
+      date: latest.date,
+      time: latest.time,
+      days: Math.floor((Date.now() - new Date((latest.date || "") + "T00:00:00")) / 86400000),
+      episodes: episode,
+      latestTitle: latest.title || "",
+      firstDate: first.date || "",
+      firstTime: first.time || ""
+    });
+  }
+
   const out = { RS11: [], P40: [] };
-  map.forEach((r, serial) => {
-    const isOut = r.back === false;
-    if (isOut && (r.type === 'RS11' || r.type === 'P40'))
-      out[r.type].push({ serial, date: r.date, time: r.time, title: r.title, ticket: r.ticket, tech: r.tech, desc: r.desc });
-  });
+  for (const item of map.values()) {
+    out[item.type].push(item);
+  }
+
+  out.RS11.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+  out.P40.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+
   return out;
 }
-    function computeOutOfService() { const det = computeOutOfServiceDetail(); const total = det.RS11.length + det.P40.length; return { total, byType: det }; }
+function computeOutOfService() {
+  const det = computeOutOfServiceDetail();
+  return {
+    total: det.RS11.length + det.P40.length,
+    byType: det
+  };
+}
     function maintPasses(r, q) { const tstr = (q||'').toLowerCase(); if (!tstr) return true; return [r.serial, r.title||'', r.ticket||'', r.tech||''].join(' ').toLowerCase().includes(tstr); }
 
     function calcDaysSince(dateStr) {
@@ -1431,37 +1466,137 @@ function computeOutOfServiceDetail() {
       const today = new Date(); today.setHours(0,0,0,0);
       return Math.max(0, Math.round((today - start) / 86400000));
     }
-    function renderMaintenance() {
-      const filt = $('#maintFilterType')?.value || 'ALL';
-      const det = computeOutOfServiceDetail(); const q = ($('#maintSearch')?.value||''); const sort = ($('#maintSort')?.value||'SERIAL');
-      const wrap = $('#maintList'); wrap.innerHTML = '';
-      const types = ['RS11','P40']; let any = 0;
-      types.forEach(t => {
-        if (filt!=='ALL' && filt!==t) return;
-        let arr = det[t]; if (!arr.length) return; any += arr.length;
-        const card = document.createElement('div'); card.className = 'card';
-        const inner = document.createElement('div'); inner.className = 'col';
-        const head = document.createElement('div'); head.innerHTML = `<b>${t} – ${arr.length} ${LANG==='cs'?'ks':'pcs'}</b>`; inner.appendChild(head);
-        const table = document.createElement('table'); table.className = 'table';
-        table.innerHTML = `<thead><tr><th>${LANG==='cs'?'Sériové číslo':'Serial'}</th><th>${LANG==='cs'?'Datum':'Date'}</th><th>${LANG==='cs'?'Čas':'Time'}</th><th>${LANG==='cs'?'Nadpis':'Title'}</th><th>Ticket</th><th>${LANG==='cs'?'Technik':'Technician'}</th><th class="right" style="color:#dc4646;">${LANG==='cs'?'Dní mimo provoz':'Days out'}</th></tr></thead>`;
-        const tb = document.createElement('tbody');
-        arr = arr.filter(x=> maintPasses(x, q));
-        arr.sort((a,b)=> sort==='SERIAL' ? (a.serial>b.serial?1:-1) : (((b.date||'')+' '+(b.time||'')) > ((a.date||'')+' '+(a.time||'')) ? 1 : -1));
-        arr.forEach(r => {
-          const tr = document.createElement('tr'); tr.style.cursor='pointer';
-          tr.innerHTML = `<td>${r.serial}</td><td>${r.date||''}</td><td>${r.time||''}</td><td>${r.title||''}</td><td>${r.ticket||''}</td><td>${Array.isArray(r.tech)?r.tech.join(', '):(r.tech||'')}</td><td class="right"><span style="background:#370a0a;color:#dc4646;border:1px solid #dc4646;border-radius:20px;padding:2px 10px;font-size:.85em;font-weight:700;">${calcDaysSince(r.date)} ${LANG==='cs'?'dní':'days'}</span></td>`;
-          const detail = document.createElement('tr'); detail.className='hidden';
-          const td = document.createElement('td'); td.colSpan=7; td.innerHTML = `<div class="soft" style="padding:8px 4px;"><b>${LANG==='cs'?'Popis':'Description'}:</b> ${(r.desc||'').replaceAll('<','&lt;').replaceAll('>','&gt;')}</div>`;
-          detail.appendChild(td);
-          tr.addEventListener('click', ()=> detail.classList.toggle('hidden'));
-          tb.appendChild(tr); tb.appendChild(detail);
-        });
-        table.appendChild(tb); inner.appendChild(table); card.appendChild(inner); wrap.appendChild(card);
-      });
-      if (any===0) { const ok = document.createElement('div'); ok.className = 'center soft'; ok.textContent = t('all_ok'); wrap.appendChild(ok); }
-      refreshKPIs();
+function renderMaintenance() {
+  const filt = maintFilterType?.value || "ALL";
+  const q = (maintSearch?.value || "").toLowerCase().trim();
+  const sort = maintSort?.value || "SERIAL";
+  const wrap = maintList;
+  wrap.innerHTML = "";
+
+  const det = computeOutOfServiceDetail();
+  const types = ["RS11", "P40"];
+  let any = 0;
+
+  types.forEach(type => {
+    if (filt !== "ALL" && filt !== type) return;
+
+    let arr = det[type] || [];
+    if (!arr.length) return;
+    any += arr.length;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const inner = document.createElement("div");
+    inner.className = "col";
+
+    const head = document.createElement("div");
+    head.className = "section-title";
+    head.innerHTML = `<div><b>${type}</b> <span class="soft">${arr.length} ks</span></div>`;
+    inner.appendChild(head);
+
+    const table = document.createElement("table");
+    table.className = "table";
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Sériové číslo</th>
+          <th>Technik</th>
+          <th>Dní mimo provoz</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+    const tb = table.querySelector("tbody");
+
+    let rows = arr.slice();
+    if (q) {
+      rows = rows.filter(r =>
+        [r.serial, r.tech, String(r.days)].join(" ").toLowerCase().includes(q)
+      );
     }
 
+    if (sort === "SERIAL") {
+      rows.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+    } else {
+      rows.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
+    }
+
+    rows.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.style.cursor = "pointer";
+      tr.innerHTML = `
+        <td><b>${item.serial}</b></td>
+        <td>${item.tech || ""}</td>
+        <td>${item.days}</td>
+      `;
+
+      const detail = document.createElement("tr");
+      detail.className = "hidden";
+
+      const td = document.createElement("td");
+      td.colSpan = 3;
+      td.innerHTML = `
+        <div class="soft" style="padding:8px 4px 4px">
+          <b>Servisní záznamy od posledního vstupu do údržby</b>
+          <div style="margin-top:8px" class="col" data-maint-detail="${item.serial}"></div>
+        </div>
+      `;
+      detail.appendChild(td);
+
+      tr.addEventListener("click", async () => {
+        detail.classList.toggle("hidden");
+        const box = td.querySelector(`[data-maint-detail="${item.serial}"]`);
+        if (box.dataset.loaded === "1") return;
+
+        const episode = item.episodes || [];
+        box.innerHTML = "";
+
+        if (!episode.length) {
+          box.innerHTML = `<div class="soft">Žádné detailní záznamy.</div>`;
+          box.dataset.loaded = "1";
+          return;
+        }
+
+        episode.forEach(r => {
+          const row = document.createElement("div");
+          row.className = "hist-item";
+          row.innerHTML = `
+            <div class="hist-head" style="cursor:default">
+              <div class="hist-title">${r.date} ${r.time} — ${r.title || ""}</div>
+              <div class="hist-meta">
+                <span class="tag">${r.back === false ? "mimo provoz" : r.back === true ? "vrácen" : "neutral"}</span>
+              </div>
+            </div>
+            <div style="margin-top:6px" class="soft">
+              Ticket: ${r.ticket || "-"}<br>
+              Technik: ${Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "-")}<br>
+              Popis: ${r.desc || ""}
+            </div>
+          `;
+          box.appendChild(row);
+        });
+
+        box.dataset.loaded = "1";
+      });
+
+      tb.appendChild(tr);
+      tb.appendChild(detail);
+    });
+
+    table.appendChild(tb);
+    inner.appendChild(table);
+    card.appendChild(inner);
+    wrap.appendChild(card);
+  });
+
+  if (!any) {
+    const ok = document.createElement("div");
+    ok.className = "center soft";
+    ok.textContent = "Žádní roboti nejsou mimo provoz.";
+    wrap.appendChild(ok);
+  }
+}
     function renderParts() {
       const tb=$('#partsTable tbody'); if(!tb) return; tb.innerHTML='';
       const q=($('#partsSearch')?.value||'').toLowerCase();
