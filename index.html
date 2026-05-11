@@ -565,7 +565,7 @@
         csv_headers: ["Datum","Čas","Typ","Sériové číslo","Nadpis","Ticket","Použité díly","Technik","Vyřazen z provozu","Vrácen do provozu","Popis"],
         L_out: "Vyřazen z provozu", L_returned: "Vrácen do provozu",
         alert_saved: "Záznam uložen.", alert_updated: "Záznam upraven.", alert_folder_pick_fail: "Výběr složky byl zrušen nebo selhal.", alert_choose_data: "Nejprve zvolte složku /data.", alert_no_stock: "Na skladě už není žádný kus tohoto dílu.",
-        form_ext_tech: "Externistický technik",
+        form_ext_tech: "Externí technik",
         form_title_new: "Nový servisní záznam",
         form_title_edit: "Upravit servisní záznam",
         kpi_records: "Servisních záznamů", stats_chart_title: "Graf odstávek robotů", stats_period_all: "Celkem", stats_period_month: "Měsíčně", stats_period_quarter: "Čtvrtletně", stats_period_year: "Ročně", stats_reli_title: "Přehled spolehlivosti robotů", stats_col_robot: "Robot", stats_col_count: "Zásahy", stats_col_days: "Celkem dní", stats_col_fault: "Nejčastější závada", stats_col_reli: "Spolehlivost",
@@ -1110,11 +1110,17 @@
     function resetFormOnlyPhotos() {
       photoHandles=[]; $('#srvPhotoPreview').innerHTML=''; $('#srvPhotoCount').textContent='0 souborů';
       fileHandles=[]; $('#srvFileCount').textContent='0 souborů'; $('#srvFileList').innerHTML='';
+      $('#srvDate').value='niceNow().date';
+      $('#srvTime').value='niceNow().time';
+      $('#srvType').value='Jin';
       $('#srvFolder').value='';
       $('#srvTitle').value = ''; $('#srvTicket').value='';
       $('#srvTicketLink').value=''; $('#srvPartNo').value=''; $('#srvPartName').value='';
       $('#srvDesc').value=''; $('#srvTech').value='';
       $('#srvPartSelect').value='-1';
+      rebuildSerials();
+      const extTechEl = document.getElementById('srvExtTech');
+      if (extTechEl) extTechEl.value = '';
       editIndex = -1; srvStatus = 'none'; $('#srvMarkOut').classList.remove('primary'); $('#srvMarkBack').classList.remove('primary');
       $('#srvSave').textContent = t('form_save'); $('#srvCancelEdit').classList.add('hidden');
       updateStatusButtons();
@@ -1391,27 +1397,31 @@ function exportCSV() {
       const a = document.createElement('a'); a.href = url; a.download = `servisni_historie_${ts}.csv`; a.click(); setTimeout(()=> URL.revokeObjectURL(url), 0);
     }
 
-    function computeOutOfServiceDetail() {
-      const map = new Map();
-      // Seřadíme podle data a času (nejnovější první) a pak vezmeme pro každý serial nejnovější záznam
-      const sorted = [...servis].sort((a,b)=> {
-        const ad = (a.date||'') + ' ' + (a.time||'');
-        const bd = (b.date||'') + ' ' + (b.time||'');
-        return bd.localeCompare(ad); // nejnovější první
-      });
-      for (const r of sorted) { 
-        if (!r.serial) continue; 
-        if (!map.has(r.serial)) map.set(r.serial, r); 
-      }
-      const out = { RS11:[], P40:[] };
-      map.forEach((r, serial) => { 
-        const isOut = (r.back===false); 
-        if (isOut && (r.type==='RS11' || r.type==='P40')) { 
-          out[r.type].push({ serial, date:r.date, time:r.time, title:r.title, ticket:r.ticket, tech:r.tech, desc:r.desc||'' }); 
-        } 
-      });
-      return out;
+function computeOutOfServiceDetail() {
+  const map = new Map();
+  // seřadit od nejnovějšího
+  const sorted = [...servis].sort((a, b) => {
+    const ad = a.date + a.time;
+    const bd = b.date + b.time;
+    return bd.localeCompare(ad);
+  });
+  for (const r of sorted) {
+    if (!r.serial) continue;
+    if (map.has(r.serial)) continue;  // máme už novější
+    // ← OPRAVA: zapiš jen pokud back není null
+    if (r.back !== null) {
+      map.set(r.serial, r);
     }
+    // pokud r.back === null, přeskočíme a hledáme starší záznam
+  }
+  const out = { RS11: [], P40: [] };
+  map.forEach((r, serial) => {
+    const isOut = r.back === false;
+    if (isOut && (r.type === 'RS11' || r.type === 'P40'))
+      out[r.type].push({ serial, date: r.date, time: r.time, title: r.title, ticket: r.ticket, tech: r.tech, desc: r.desc });
+  });
+  return out;
+}
     function computeOutOfService() { const det = computeOutOfServiceDetail(); const total = det.RS11.length + det.P40.length; return { total, byType: det }; }
     function maintPasses(r, q) { const tstr = (q||'').toLowerCase(); if (!tstr) return true; return [r.serial, r.title||'', r.ticket||'', r.tech||''].join(' ').toLowerCase().includes(tstr); }
 
