@@ -1410,53 +1410,76 @@ function getLatestMaintenanceState(serial) {
   }
   return null;
 }
-function computeOutOfServiceDetail() {
+function getMaintenanceEpisode(serial) {
   const rows = [...servis]
-    .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial)
-    .sort((a, b) => normalizeTS(b).localeCompare(normalizeTS(a)));
+    .filter(r => r.serial === serial)
+    .sort(sortNewestFirst);
 
-  const map = new Map();
+  let started = false;
+  const episode = [];
 
   for (const r of rows) {
-    if (map.has(r.serial)) continue;
-
-    const latest = getLatestMaintenanceState(r.serial);
-    if (!latest) continue;
-    if (latest.back !== false) continue;
-
-    const episode = getMaintenanceEpisodesForSerial(r.serial);
-    const first = episode[episode.length - 1] || latest;
-
-    map.set(r.serial, {
-      serial: r.serial,
-      type: r.type,
-      tech: latest.tech || "",
-      date: latest.date,
-      time: latest.time,
-      days: Math.floor((Date.now() - new Date((latest.date || "") + "T00:00:00")) / 86400000),
-      episodes: episode,
-      latestTitle: latest.title || "",
-      firstDate: first.date || "",
-      firstTime: first.time || ""
-    });
+    if (!started) {
+      if (r.back === false) {
+        started = true;
+        episode.push(r);
+      }
+      continue;
+    }
+    if (r.back === true) break;
+    episode.push(r);
   }
 
+  return episode;
+}    
+function tsKey(r) {
+  return `${r.date || ""} ${r.time || ""}`;
+}
+
+function sortNewestFirst(a, b) {
+  return tsKey(b).localeCompare(tsKey(a));
+}    
+function getActiveMaintenanceSerials() {
+  const latest = new Map();
+  const rows = [...servis]
+    .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial)
+    .sort(sortNewestFirst);
+
+  for (const r of rows) {
+    if (latest.has(r.serial)) continue;
+    if (r.back === false) latest.set(r.serial, r);
+  }
+
+  return latest;
+}    
+function computeOutOfServiceDetail() {
+  const active = getActiveMaintenanceSerials();
   const out = { RS11: [], P40: [] };
-  for (const item of map.values()) {
-    out[item.type].push(item);
-  }
+
+  active.forEach((r, serial) => {
+    const episode = getMaintenanceEpisode(serial);
+    const latest = episode[0] || r;
+    const days = Math.max(
+      0,
+      Math.floor((Date.now() - new Date(`${latest.date}T00:00:00`)) / 86400000)
+    );
+
+    out[r.type].push({
+      serial,
+      tech: latest.tech || "",
+      days,
+      latest,
+      episode
+    });
+  });
 
   out.RS11.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
   out.P40.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
-
   return out;
 }
 function computeOutOfService() {
   const det = computeOutOfServiceDetail();
-  return {
-    total: det.RS11.length + det.P40.length,
-    byType: det
-  };
+  return { total: det.RS11.length + det.P40.length, byType: det };
 }
     function maintPasses(r, q) { const tstr = (q||'').toLowerCase(); if (!tstr) return true; return [r.serial, r.title||'', r.ticket||'', r.tech||''].join(' ').toLowerCase().includes(tstr); }
 
@@ -1477,11 +1500,37 @@ function renderMaintenance() {
   const types = ["RS11", "P40"];
   let any = 0;
 
-  types.forEach(type => {
-    if (filt !== "ALL" && filt !== type) return;
+  for (const type of types) {
+    if (filt !== "ALL" && filt !== type) continue;
 
-    let arr = det[type] || [];
-    if (!arr.length) return;
+    let arr = (det[type] || []).slice();
+    if (!arr.length) continue;
+
+    if (q) {
+      arr = arr.filter(x => {
+        const hay = [
+          x.serial,
+          x.tech,
+          String(x.days),
+          x.latest?.title,
+          x.latest?.ticket,
+          x.latest?.desc
+        ].join(" ").toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    if (sort === "SERIAL") {
+      arr.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+    } else {
+      arr.sort((a, b) => {
+        const da = new Date(`${a.latest.date}T${a.latest.time || "00:00"}`);
+        const db = new Date(`${b.latest.date}T${b.latest.time || "00:00"}`);
+        return db - da;
+      });
+    }
+
+    if (!arr.length) continue;
     any += arr.length;
 
     const card = document.createElement("div");
@@ -1509,20 +1558,7 @@ function renderMaintenance() {
     `;
     const tb = table.querySelector("tbody");
 
-    let rows = arr.slice();
-    if (q) {
-      rows = rows.filter(r =>
-        [r.serial, r.tech, String(r.days)].join(" ").toLowerCase().includes(q)
-      );
-    }
-
-    if (sort === "SERIAL") {
-      rows.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
-    } else {
-      rows.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
-    }
-
-    rows.forEach(item => {
+    arr.forEach(item => {
       const tr = document.createElement("tr");
       tr.style.cursor = "pointer";
       tr.innerHTML = `
@@ -1536,20 +1572,15 @@ function renderMaintenance() {
 
       const td = document.createElement("td");
       td.colSpan = 3;
-      td.innerHTML = `
-        <div class="soft" style="padding:8px 4px 4px">
-          <b>Servisní záznamy od posledního vstupu do údržby</b>
-          <div style="margin-top:8px" class="col" data-maint-detail="${item.serial}"></div>
-        </div>
-      `;
+      td.innerHTML = `<div class="soft" style="padding:8px 4px 4px"><b>Servisní záznamy</b><div class="col" data-maint-detail="${item.serial}"></div></div>`;
       detail.appendChild(td);
 
-      tr.addEventListener("click", async () => {
+      tr.addEventListener("click", () => {
         detail.classList.toggle("hidden");
         const box = td.querySelector(`[data-maint-detail="${item.serial}"]`);
         if (box.dataset.loaded === "1") return;
 
-        const episode = item.episodes || [];
+        const episode = item.episode || [];
         box.innerHTML = "";
 
         if (!episode.length) {
@@ -1588,7 +1619,7 @@ function renderMaintenance() {
     inner.appendChild(table);
     card.appendChild(inner);
     wrap.appendChild(card);
-  });
+  }
 
   if (!any) {
     const ok = document.createElement("div");
