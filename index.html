@@ -1415,30 +1415,28 @@ function getMaintenanceEpisode(serial) {
     .filter(r => r.serial === serial)
     .sort(sortNewestFirst);
 
-  let started = false;
-  const episode = [];
+  const start = rows.findIndex(r => r.back === false);
+  if (start === -1) return [];
 
-  for (const r of rows) {
-    if (!started) {
-      if (r.back === false) {
-        started = true;
-        episode.push(r);
-      }
-      continue;
-    }
-    if (r.back === true) break;
+  const episode = [];
+  for (let i = start; i < rows.length; i++) {
+    const r = rows[i];
     episode.push(r);
+    if (r.back === true) break;
   }
 
-  return episode;
-}    
-function tsKey(r) {
-  return `${r.date || ""} ${r.time || ""}`;
+  return episode.sort(sortNewestFirst);
 }
+function getLastRelevantState(serial) {
+  const rows = [...servis]
+    .filter(r => r.serial === serial)
+    .sort(sortNewestFirst);
 
+  return rows.find(r => r.back === true || r.back === false) || null;
+}
 function sortNewestFirst(a, b) {
   return tsKey(b).localeCompare(tsKey(a));
-}    
+}   
 function getActiveMaintenanceSerials() {
   const latest = new Map();
   const rows = [...servis]
@@ -1453,28 +1451,37 @@ function getActiveMaintenanceSerials() {
   return latest;
 }    
 function computeOutOfServiceDetail() {
-  const active = getActiveMaintenanceSerials();
-  const out = { RS11: [], P40: [] };
+  const rows = [...servis]
+    .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial)
+    .sort(sortNewestFirst);
 
-  active.forEach((r, serial) => {
-    const episode = getMaintenanceEpisode(serial);
-    const latest = episode[0] || r;
-    const days = Math.max(
-      0,
-      Math.floor((Date.now() - new Date(`${latest.date}T00:00:00`)) / 86400000)
-    );
+  const map = new Map();
 
-    out[r.type].push({
-      serial,
+  for (const r of rows) {
+    if (map.has(r.serial)) continue;
+
+    const last = getLastRelevantState(r.serial);
+    if (!last || last.back !== false) continue;
+
+    const episode = getMaintenanceEpisode(r.serial);
+    const latest = episode[0] || last;
+
+    map.set(r.serial, {
+      serial: r.serial,
+      type: r.type,
       tech: latest.tech || "",
-      days,
+      days: Math.max(0, Math.floor((Date.now() - new Date(`${last.date}T00:00:00`)) / 86400000)),
       latest,
       episode
     });
-  });
+  }
+
+  const out = { RS11: [], P40: [] };
+  map.forEach(item => out[item.type].push(item));
 
   out.RS11.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
   out.P40.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+
   return out;
 }
 function computeOutOfService() {
