@@ -1434,6 +1434,9 @@ function getLastRelevantState(serial) {
 
   return rows.find(r => r.back === true || r.back === false) || null;
 }
+function tsKey(r) {
+  return `${r.date || ""} ${r.time || ""}`;
+}
 function sortNewestFirst(a, b) {
   return tsKey(b).localeCompare(tsKey(a));
 }   
