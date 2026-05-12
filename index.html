@@ -1411,19 +1411,24 @@ function getLatestMaintenanceState(serial) {
   return null;
 }
 function getMaintenanceEpisode(serial) {
+  // Seřadit záznamy od nejnovějšího po nejstarší
   const rows = [...servis]
     .filter(r => r.serial === serial)
     .sort(sortNewestFirst);
 
-  const start = rows.findIndex(r => r.back === false);
-  if (start === -1) return [];
+  // Najdi index posledního "Dán do údržby" (back === false)
+  // Toto je START aktuální epizody
+  const startIndex = rows.findIndex(r => r.back === false);
+  if (startIndex === -1) return [];
 
-  const episode = [];
-  for (let i = start; i < rows.length; i++) {
-    const r = rows[i];
-    episode.push(r);
-    if (r.back === true) break;
-  }
+  // Vezmi všechny záznamy od nejnovějšího AŽ po ten "back === false" včetně
+  // Zastavíme se na záznamu back === false, ale pouze na tom NEJNOVĚJŠÍM
+  // Pokud před ním (= novější) je back === true, tak robot již není v údržbě
+  // — to řeší computeOutOfServiceDetail, takže tady bereme vše až na startIndex
+  const episode = rows.slice(0, startIndex + 1);
+
+  return episode; // již seřazeno od nejnovějšího
+}
 
   return episode.sort(sortNewestFirst);
 }
