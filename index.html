@@ -1062,8 +1062,16 @@
 
     function populateTechFilter() {
       const sel = $('#histTech');
-      const techs = Array.from(new Set(servis.map(r => r.tech).filter(Boolean))).sort();
-      sel.innerHTML = '<option value="ALL">Všichni</option>' + techs.map(t=>`<option>${t}</option>`).join('');
+      // r.tech může být pole nebo řetězec — rozložit na jednotlivé jména a deduplikovat
+      const techSet = new Set();
+      servis.forEach(r => {
+        const val = r.tech;
+        if (!val) return;
+        if (Array.isArray(val)) val.forEach(v => { if (v) techSet.add(v.trim()); });
+        else String(val).split(',').forEach(v => { if (v.trim()) techSet.add(v.trim()); });
+      });
+      const techs = Array.from(techSet).sort((a, b) => a.localeCompare(b, 'cs'));
+      sel.innerHTML = `<option value="ALL">${t('filter_all_tech')}</option>` + techs.map(v => `<option value="${v}">${v}</option>`).join('');
     }
     function passesHistFilters(r) {
       const q = ($('#histSearch')?.value||'').toLowerCase();
@@ -1077,7 +1085,13 @@
       if (status==='BACK' && r.back!==true) return false;
       if (status==='OUT' && r.back!==false) return false;
       if (status==='NEUTRAL' && r.back!==null) return false;
-      if (techF!=='ALL' && (r.tech||'')!==techF) return false;
+      if (techF !== 'ALL') {
+        // r.tech může být pole nebo řetězec — hledat technika jako jednotlivé jméno
+        const techArr = Array.isArray(r.tech)
+          ? r.tech.map(v => v.trim())
+          : String(r.tech || '').split(',').map(v => v.trim());
+        if (!techArr.includes(techF)) return false;
+      }
       if (from && (r.date||'') < from) return false;
       if (to && (r.date||'') > to) return false;
       if (!textIn(r.type||'', r.serial||'', r.title||'', r.ticket||'', r.partNo||'', r.partName||'', r.tech||'')) return false;
