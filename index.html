@@ -560,7 +560,7 @@
         btn_edit: "Editovat", btn_delete: "Smazat (i složku)",
         all_ok: "Žádný robot není mimo provoz.",
         parts_title: "Náhradní díly", parts_add: "Přidat díl", parts_name: "Název", parts_number: "Číslo", parts_qty: "Ks", parts_type: "Typ", parts_added: "Evidováno", partslastupdate: "Poslední změna", parts_actions: "Akce", parts_plus: "+1", parts_tab_list: "Seznam dílů", parts_tab_hist: "Historie použití", parts_hist_name: "Název dílu", parts_hist_no: "Číslo dílu", parts_hist_date: "Datum použití", parts_hist_tech: "Kdo použil", parts_hist_qty: "Ks", parts_hist_serial: "Sériové č. robota",
-        export_title: "Export/backup", export_parts_pdf: "Export parts to PDF", export_parts_pdf: "Export dílů do PDF", export_serv: "Stáhnout servisni.json", export_parts: "Stáhnout dily.json",
+        export_title: "Export/backup", export_parts_pdf: "Export dílů do PDF", export_serv: "Stáhnout servisni.json", export_parts: "Stáhnout dily.json",
         maint_title: "Roboti mimo provoz", maint_filter: "Filtrovat:", maint_all: "Vše", maint_search: "Hledat", maint_search_ph: "sériové / název / ticket / technik...", maint_sort_label: "Řazení", maint_sort_serial: "Podle sériového čísla", maint_sort_date: "Podle data (nejnovější)", maint_ks: "ks",
         csv_headers: ["Datum","Čas","Typ","Sériové číslo","Nadpis","Ticket","Použité díly","Technik","Vyřazen z provozu","Vrácen do provozu","Popis"],
         L_out: "Vyřazen z provozu", L_returned: "Vrácen do provozu",
@@ -583,7 +583,6 @@
         del_wrong_pw_part: "Nesprávné heslo. Díl nebyl smazán.",
         export_xlsx: "Export historie do XLSX",
         export_pdf: "Export historie do PDF",
-        export_parts_pdf: "Export dílů do PDF",
         parts_pw_plus: "Zadej heslo pro přidání kusu:",
         parts_pw_edit: "Zadej heslo pro editaci dílu:",
         parts_pw_wrong: "Nesprávné heslo. Akce zrušena.",
@@ -1490,6 +1489,10 @@ function computeOutOfService() {
       return Math.max(0, Math.round((today - start) / 86400000));
     }
 function renderMaintenance() {
+  const maintFilterType = $('#maintFilterType');
+  const maintSearch = $('#maintSearch');
+  const maintSort = $('#maintSort');
+  const maintList = $('#maintList');
   const filt = maintFilterType?.value || "ALL";
   const q = (maintSearch?.value || "").toLowerCase().trim();
   const sort = maintSort?.value || "SERIAL";
