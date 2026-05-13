@@ -902,6 +902,56 @@
     }
 
     function applyI18n(){
+      const gatePick = document.getElementById('gatePick');
+      if (gatePick) {
+        gatePick.addEventListener('click', async () => {
+          if (!window.showDirectoryPicker) {
+            alert('Tento prohlížeč nepodporuje práci se složkami.');
+            return;
+          }
+          try {
+            dataDir = await window.showDirectoryPicker({ id: 'data-folder', mode: 'readwrite' });
+            pickedInfo.textContent = 'Složka načtena';
+            pickData.classList.add('hidden');
+            pickedInfo.classList.remove('soft');
+            topNav.classList.remove('hidden');
+            secGate.classList.add('hidden');
+            secHome.classList.remove('hidden');
+            servis = await ensureJSON('servisni.json');
+            dily = await ensureJSON('dily.json');
+            populateTechFilter();
+            renderServisList();
+            renderParts();
+            populatePartSelect();
+            renderMaintenance();
+            refreshKPIs();
+            const n = niceNow();
+            srvDate.value = n.date;
+            srvTime.value = n.time;
+            srvType.value = 'Jin';
+            rebuildSerials();
+            resetFormOnlyPhotos();
+            goto('secHome');
+          } catch (err) {
+            console.error(err);
+            if (err?.name === 'AbortError') return;
+            alert(t('alertfolderpickfail'));
+          }
+        });
+      }
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          const cur = document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          document.body.setAttribute('data-theme', cur);
+          themeToggle.textContent = cur === 'light' ? '🌙' : '☀️';
+       });
+     }
+
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+      langSelect.addEventListener('change', e => setLang(e.target.value));
+    }
       const navBtns = document.querySelectorAll('#topNav [data-goto]');
       const navText = [t('nav_home'), t('nav_service'), t('nav_maintenance'), t('nav_stats'), t('nav_parts'), t('nav_export')];
       navBtns.forEach((b,i)=> b.textContent = navText[i] || b.textContent);
