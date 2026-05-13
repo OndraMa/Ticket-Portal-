@@ -1594,28 +1594,47 @@ function renderMaintenance() {
           }
 
           episode.forEach(r => {
-            const statusLabel = r.back === false ? "mimo provoz" : r.back === true ? "vrácen" : "neutral";
-            const statusStyle = r.back === false
-              ? "background:#2a1517;border-color:#52252a;color:#fecaca;"
+            const statusLabel = r.back === false ? "mimo provoz" : r.back === true ? "vrácen" : "";
+            const statusPill = r.back === false
+              ? `<span class="tag" style="background:#2a1620;border-color:#4b2732;color:#fecaca;">${statusLabel}</span>`
               : r.back === true
-                ? "background:#0e321c;border-color:#28553a;color:#bbf7d0;"
+                ? `<span class="tag">${statusLabel}</span>`
                 : "";
+
             const row = document.createElement("div");
             row.className = "hist-item";
-            row.style.marginTop = "6px";
-            row.innerHTML = `
-              <div class="hist-head" style="cursor:default">
-                <div class="hist-title">${r.date || ""} ${r.time || ""} — ${r.title || ""}</div>
-                <div class="hist-meta">
-                  <span class="pill" style="font-size:11px;${statusStyle}">${statusLabel}</span>
-                </div>
+            row.style.marginTop = "8px";
+
+            const head = document.createElement("div");
+            head.className = "hist-head";
+            head.innerHTML = `
+              <div class="hist-title">
+                <span class="soft" style="font-weight:400;font-size:12px;">${r.date || ""} ${r.time || ""}</span>
+                ${r.title ? ` — ${r.title}` : ""}
               </div>
-              <div style="margin-top:6px;font-size:13px;" class="soft">
-                ${r.ticket ? `Ticket: <b>${r.ticket}</b><br>` : ""}
-                Technik: ${Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "—")}<br>
-                ${r.desc ? `Popis: ${r.desc}` : ""}
-              </div>
+              <div class="hist-meta">${statusPill}</div>
             `;
+
+            const body = document.createElement("div");
+            body.className = "hidden";
+            body.style.marginTop = "10px";
+            body.style.fontSize = "13px";
+
+            const lines = [];
+            if (r.ticket)   lines.push(`<div><span class="soft">Ticket:</span> <b>${r.ticket}</b></div>`);
+            if (r.type)     lines.push(`<div><span class="soft">Typ:</span> ${r.type}</div>`);
+            const tech = Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "");
+            if (tech)       lines.push(`<div><span class="soft">Technik:</span> ${tech}</div>`);
+            const parts = Array.isArray(r.parts) && r.parts.length
+              ? r.parts.map(p => `${p.name||p.number||p} ${p.qty ? '('+p.qty+'x)' : ''}`).join(", ")
+              : null;
+            if (parts)      lines.push(`<div><span class="soft">Díly:</span> ${parts}</div>`);
+            if (r.desc)     lines.push(`<div style="margin-top:6px;">${r.desc}</div>`);
+            body.innerHTML = lines.join("");
+
+            head.addEventListener("click", () => body.classList.toggle("hidden"));
+            row.appendChild(head);
+            row.appendChild(body);
             box.appendChild(row);
           });
         }
