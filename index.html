@@ -283,7 +283,7 @@
         <!-- ŘÁDEK 3: Nadpis úkonu – celý řádek -->
         <div style="margin-top:12px;">
           <label>Nadpis úkonu <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
-          <input id="srvTitle" type="text" placeholder="např. výměna senzoru" />
+          <input id="srvTitle" type="text" placeholder="" />
         </div>
 
         <!-- ŘÁDEK 4: Geek ticket | Geek ticket link -->
@@ -306,18 +306,18 @@
           </div>
           <div>
             <label>Číslo dílu</label>
-            <input id="srvPartNo" type="text" placeholder="vyplní se volbou z katalogu / nebo ručně" />
+            <input id="srvPartNo" type="text" placeholder="" />
           </div>
           <div>
             <label>Název dílu</label>
-            <input id="srvPartName" type="text" placeholder="vyplní se volbou z katalogu / nebo ručně" />
+            <input id="srvPartName" type="text" placeholder="" />
           </div>
         </div>
 
         <!-- ŘÁDEK 6: Popis práce – celý řádek -->
         <div style="margin-top:12px;">
           <label>Popis práce</label>
-          <textarea id="srvDesc" rows="4" placeholder="co se dělalo..."></textarea>
+          <textarea id="srvDesc" rows="4" placeholder=""></textarea>
         </div>
 
         <!-- ŘÁDEK 7: Technik | Externí technik -->
@@ -335,7 +335,7 @@
           <div style="display:flex;flex-direction:column;gap:12px;">
             <div>
               <label>Externí technik</label>
-              <input id="srvExtTech" type="text" placeholder="např. servis dodavatele…" />
+              <input id="srvExtTech" type="text" placeholder="" />
             </div>
             <!-- Fotky a soubory -->
             <div>
@@ -544,7 +544,20 @@
       cs: {
         nav_home: "Domů", nav_service: "Servis", nav_maintenance: "Údržba", nav_stats: "Statistiky", nav_parts: "Náhradní díly", nav_export: "Export",
         gate_title: "Vítej v „Geek+ by LT/VFX – Evidence robotů“",
-        gate_desc: "Nejdřív prosím vyber pracovní složku /data. Do ní se budou ukládat soubory servisni.json, dily.json a složky SERV_*.",
+        gate_desc: "Nejdříve prosím vyber sdílenou OneDrive složku \\\\OneDrive - LogTech, s.r.o\\\\Geek Ticket portál\\\\data",
+        folder_loaded: "Složka načtena",
+        ph_title: "např. výměna senzoru",
+        ph_part_catalog: "vyplní se volbou z katalogu / nebo ručně",
+        ph_desc: "co se dělalo...",
+        ph_ext_tech: "např. servis dodavatele…",
+        maint_col_serial: "Sériové číslo",
+        maint_col_tech: "Technik",
+        maint_col_days: "Dní mimo provoz",
+        maint_detail_tech: "Technik",
+        maint_detail_ticket: "Ticket",
+        maint_detail_type: "Typ",
+        maint_detail_parts: "Díly",
+        maint_no_records: "Žádné detailní záznamy.",
         gate_btn: "Vybrat složku /data",
         service_title: "Servis", service_new: "ZAPSAT ZÁZNAM", service_hist: "HISTORIE",
         form_title: "Nový servisní záznam", form_type: "Typ robota", form_serial: "Sériové číslo", form_date: "Datum", form_time: "Čas",
@@ -592,7 +605,20 @@
       en: {
         nav_home: "Home", nav_service: "Service", nav_maintenance: "Maintenance", nav_stats: "Stats", nav_parts: "Spare Parts", nav_export: "Export",
         gate_title: "Welcome to “Geek+ by LT/VFX – Robot Records”",
-        gate_desc: "Please pick the working /data folder first. Files servisni.json, dily.json and SERV_* folders will be stored there.",
+        gate_desc: "Please select the shared OneDrive folder \\\\OneDrive - LogTech, s.r.o\\\\Geek Ticket portál\\\\data",
+        folder_loaded: "Folder loaded",
+        ph_title: "e.g. sensor replacement",
+        ph_part_catalog: "filled in from catalog / or manually",
+        ph_desc: "what was done...",
+        ph_ext_tech: "e.g. supplier service…",
+        maint_col_serial: "Serial number",
+        maint_col_tech: "Technician",
+        maint_col_days: "Days out of service",
+        maint_detail_tech: "Technician",
+        maint_detail_ticket: "Ticket",
+        maint_detail_type: "Type",
+        maint_detail_parts: "Parts",
+        maint_no_records: "No detailed records.",
         gate_btn: "Pick /data folder",
         service_title: "Service", service_new: "ADD RECORD", service_hist: "HISTORY",
         form_title: "New service record", form_type: "Robot type", form_serial: "Serial number", form_date: "Date", form_time: "Time",
@@ -1021,6 +1047,17 @@
       // Externistický technik label (formLabels[12])
       const allFormLabels = document.querySelectorAll('#secServisForm label');
       if (allFormLabels[12]) allFormLabels[12].textContent = t('form_ext_tech');
+      // Placeholdery formuláře
+      if ($('#srvTitle'))    $('#srvTitle').placeholder    = t('ph_title');
+      if ($('#srvPartNo'))   $('#srvPartNo').placeholder   = t('ph_part_catalog');
+      if ($('#srvPartName')) $('#srvPartName').placeholder = t('ph_part_catalog');
+      if ($('#srvDesc'))     $('#srvDesc').placeholder     = t('ph_desc');
+      if ($('#srvExtTech'))  $('#srvExtTech').placeholder  = t('ph_ext_tech');
+      // Složka načtena — aktualizuj jen pokud už je složka vybrána
+      const pickedInfo = $('#pickedInfo');
+      if (pickedInfo && !pickedInfo.classList.contains('soft')) {
+        pickedInfo.textContent = t('folder_loaded');
+      }
     }
 
     function populateTechFilter() {
@@ -1552,9 +1589,9 @@ function renderMaintenance() {
     table.innerHTML = `
       <thead>
         <tr>
-          <th>Sériové číslo</th>
-          <th>Technik</th>
-          <th>Dní mimo provoz</th>
+          <th>${t('maint_col_serial')}</th>
+          <th>${t('maint_col_tech')}</th>
+          <th>${t('maint_col_days')}</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -1589,7 +1626,7 @@ function renderMaintenance() {
           const episode = item.episode || [];
 
           if (!episode.length) {
-            box.innerHTML = `<div class="soft" style="padding:6px 0;">Žádné detailní záznamy.</div>`;
+            box.innerHTML = `<div class="soft" style="padding:6px 0;">${t('maint_no_records')}</div>`;
             return;
           }
 
@@ -1621,14 +1658,14 @@ function renderMaintenance() {
             body.style.fontSize = "13px";
 
             const lines = [];
-            if (r.ticket)   lines.push(`<div><span class="soft">Ticket:</span> <b>${r.ticket}</b></div>`);
-            if (r.type)     lines.push(`<div><span class="soft">Typ:</span> ${r.type}</div>`);
+            if (r.ticket)   lines.push(`<div><span class="soft">${t('maint_detail_ticket')}:</span> <b>${r.ticket}</b></div>`);
+            if (r.type)     lines.push(`<div><span class="soft">${t('maint_detail_type')}:</span> ${r.type}</div>`);
             const tech = Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "");
-            if (tech)       lines.push(`<div><span class="soft">Technik:</span> ${tech}</div>`);
+            if (tech)       lines.push(`<div><span class="soft">${t('maint_detail_tech')}:</span> ${tech}</div>`);
             const parts = Array.isArray(r.parts) && r.parts.length
               ? r.parts.map(p => `${p.name||p.number||p} ${p.qty ? '('+p.qty+'x)' : ''}`).join(", ")
               : null;
-            if (parts)      lines.push(`<div><span class="soft">Díly:</span> ${parts}</div>`);
+            if (parts)      lines.push(`<div><span class="soft">${t('maint_detail_parts')}:</span> ${parts}</div>`);
             if (r.desc)     lines.push(`<div style="margin-top:6px;">${r.desc}</div>`);
             body.innerHTML = lines.join("");
 
@@ -1904,7 +1941,7 @@ th { background:#f1f5f9; text-align:left; }
         }
         try {
           dataDir = await window.showDirectoryPicker({id:'data-folder', mode:'readwrite'});
-          $('#pickedInfo').textContent = 'Složka načtena';
+          $('#pickedInfo').textContent = t('folder_loaded');
           $('#pickData').classList.add('hidden');
           $('#pickedInfo').classList.remove('soft');
           $('#topNav').classList.remove('hidden');
@@ -1939,7 +1976,7 @@ th { background:#f1f5f9; text-align:left; }
         if (!window.showDirectoryPicker) { alert('Tento prohlížeč nepodporuje práci se složkami.'); return; }
         try {
           dataDir = await window.showDirectoryPicker({id:'data-folder', mode:'readwrite'});
-          $('#pickedInfo').textContent = 'Složka načtena';
+          $('#pickedInfo').textContent = t('folder_loaded');
           $('#pickData').classList.add('hidden'); $('#pickedInfo').classList.remove('soft');
           $('#topNav').classList.remove('hidden');
           $('#secGate').classList.add('hidden');
