@@ -1410,26 +1410,18 @@ function getLatestMaintenanceState(serial) {
   return null;
 }
 function getMaintenanceEpisode(serial) {
+  // Seřadit od nejnovějšího po nejstarší
   const rows = [...servis]
     .filter(r => r.serial === serial)
     .sort(sortNewestFirst);
 
-  let started = false;
-  const episode = [];
+  // Najdi index nejnovějšího záznamu "Dán do údržby" (back === false)
+  const startIndex = rows.findIndex(r => r.back === false);
+  if (startIndex === -1) return [];
 
-  for (const r of rows) {
-    if (!started) {
-      if (r.back === false) {
-        started = true;
-        episode.push(r);
-      }
-      continue;
-    }
-    if (r.back === true) break;
-    episode.push(r);
-  }
-
-  return episode;
+  // Vezmi vše od nejnovějšího záznamu až po back===false včetně
+  // (slice(0, startIndex+1) = od indexu 0 do startIndex včetně)
+  return rows.slice(0, startIndex + 1);
 }    
 function tsKey(r) {
   return `${r.date || ""} ${r.time || ""}`;
@@ -1439,6 +1431,8 @@ function sortNewestFirst(a, b) {
   return tsKey(b).localeCompare(tsKey(a));
 }    
 function getActiveMaintenanceSerials() {
+  // Pro každý serial najdi poslední záznam s back===true nebo back===false
+  // Robot je aktivně mimo provoz pouze pokud jeho POSLEDNÍ relevantní stav je back===false
   const latest = new Map();
   const rows = [...servis]
     .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial)
@@ -1446,9 +1440,15 @@ function getActiveMaintenanceSerials() {
 
   for (const r of rows) {
     if (latest.has(r.serial)) continue;
-    if (r.back === false) latest.set(r.serial, r);
+    // Vezmi jen roboty jejichž nejnovější relevantní stav je back===false
+    if (r.back === false || r.back === true) {
+      if (r.back === false) latest.set(r.serial, r);
+      else latest.set(r.serial, null); // back===true => robot je zpět, přeskočit
+    }
   }
 
+  // Odfiltruj nullové záznamy (opravení roboti)
+  latest.forEach((v, k) => { if (v === null) latest.delete(k); });
   return latest;
 }    
 function computeOutOfServiceDetail() {
@@ -1578,40 +1578,47 @@ function renderMaintenance() {
       td.innerHTML = `<div class="soft" style="padding:8px 4px 4px"><b>Servisní záznamy</b><div class="col" data-maint-detail="${item.serial}"></div></div>`;
       detail.appendChild(td);
 
-      tr.addEventListener("click", () => {
-        detail.classList.toggle("hidden");
-        const box = td.querySelector(`[data-maint-detail="${item.serial}"]`);
-        if (box.dataset.loaded === "1") return;
+      tr.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isHidden = detail.classList.toggle("hidden");
+        // Vždy překresli obsah při otevření (ne jen jednou)
+        if (!isHidden) {
+          const box = td.querySelector(`[data-maint-detail="${item.serial}"]`);
+          box.innerHTML = "";
 
-        const episode = item.episode || [];
-        box.innerHTML = "";
+          const episode = item.episode || [];
 
-        if (!episode.length) {
-          box.innerHTML = `<div class="soft">Žádné detailní záznamy.</div>`;
-          box.dataset.loaded = "1";
-          return;
-        }
+          if (!episode.length) {
+            box.innerHTML = `<div class="soft" style="padding:6px 0;">Žádné detailní záznamy.</div>`;
+            return;
+          }
 
-        episode.forEach(r => {
-          const row = document.createElement("div");
-          row.className = "hist-item";
-          row.innerHTML = `
-            <div class="hist-head" style="cursor:default">
-              <div class="hist-title">${r.date} ${r.time} — ${r.title || ""}</div>
-              <div class="hist-meta">
-                <span class="tag">${r.back === false ? "mimo provoz" : r.back === true ? "vrácen" : "neutral"}</span>
+          episode.forEach(r => {
+            const statusLabel = r.back === false ? "mimo provoz" : r.back === true ? "vrácen" : "neutral";
+            const statusStyle = r.back === false
+              ? "background:#2a1517;border-color:#52252a;color:#fecaca;"
+              : r.back === true
+                ? "background:#0e321c;border-color:#28553a;color:#bbf7d0;"
+                : "";
+            const row = document.createElement("div");
+            row.className = "hist-item";
+            row.style.marginTop = "6px";
+            row.innerHTML = `
+              <div class="hist-head" style="cursor:default">
+                <div class="hist-title">${r.date || ""} ${r.time || ""} — ${r.title || ""}</div>
+                <div class="hist-meta">
+                  <span class="pill" style="font-size:11px;${statusStyle}">${statusLabel}</span>
+                </div>
               </div>
-            </div>
-            <div style="margin-top:6px" class="soft">
-              Ticket: ${r.ticket || "-"}<br>
-              Technik: ${Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "-")}<br>
-              Popis: ${r.desc || ""}
-            </div>
-          `;
-          box.appendChild(row);
-        });
-
-        box.dataset.loaded = "1";
+              <div style="margin-top:6px;font-size:13px;" class="soft">
+                ${r.ticket ? `Ticket: <b>${r.ticket}</b><br>` : ""}
+                Technik: ${Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "—")}<br>
+                ${r.desc ? `Popis: ${r.desc}` : ""}
+              </div>
+            `;
+            box.appendChild(row);
+          });
+        }
       });
 
       tb.appendChild(tr);
