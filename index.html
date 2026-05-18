@@ -63,6 +63,14 @@
     .section-title { display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .thumbs { display:flex; flex-wrap:wrap; gap:8px; }
     .thumbs img { width: 120px; height: 90px; object-fit:cover; border-radius:10px; border:1px solid var(--border); cursor:pointer; }
+    .thumb-wrap { position:relative; display:inline-block; }
+    .thumb-wrap .thumb-remove { position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:var(--danger,#e05252); color:#fff; border:none; cursor:pointer; font-size:13px; line-height:20px; text-align:center; padding:0; display:flex; align-items:center; justify-content:center; opacity:0.9; }
+    .thumb-wrap .thumb-remove:hover { opacity:1; transform:scale(1.1); }
+    .file-chip { display:inline-flex; align-items:center; gap:6px; background:var(--chip-bg,#1b2330); border:1px solid var(--border); border-radius:999px; padding:3px 10px 3px 12px; font-size:13px; max-width:260px; }
+    .file-chip span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .file-chip button { background:none; border:none; cursor:pointer; color:var(--muted); font-size:15px; line-height:1; padding:0; margin-left:2px; }
+    .file-chip button:hover { color:var(--danger,#e05252); }
+    #srvFileList { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
     .hist-item { border:1px solid var(--border); background:#11161f; border-radius:14px; padding:12px; }
     .hist-head { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; }
     .hist-title { font-weight:800; }
@@ -1133,10 +1141,38 @@
 
     async function renderPickedPreviews() {
       const box = $('#srvPhotoPreview'); box.innerHTML = '';
-      for (const h of photoHandles) {
+      for (let i = 0; i < photoHandles.length; i++) {
+        const h = photoHandles[i];
         const f = await h.getFile(); const url = URL.createObjectURL(f);
+        const wrap = document.createElement('div'); wrap.className = 'thumb-wrap';
         const img = document.createElement('img'); img.src = url; img.title = f.name;
-        img.addEventListener('click', ()=> window.open(url, '_blank')); box.appendChild(img);
+        img.addEventListener('click', ()=> window.open(url, '_blank'));
+        const btn = document.createElement('button'); btn.className = 'thumb-remove'; btn.innerHTML = '&times;'; btn.title = LANG==='cs'?'Odebrat':'Remove';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          photoHandles.splice(i, 1);
+          $('#srvPhotoCount').textContent = `${photoHandles.length} souborů`;
+          renderPickedPreviews();
+        });
+        wrap.appendChild(img); wrap.appendChild(btn); box.appendChild(wrap);
+      }
+    }
+
+    function renderPickedFiles() {
+      const box = $('#srvFileList'); box.innerHTML = '';
+      for (let i = 0; i < fileHandles.length; i++) {
+        const h = fileHandles[i];
+        h.getFile().then(f => {
+          const chip = document.createElement('div'); chip.className = 'file-chip';
+          const span = document.createElement('span'); span.textContent = f.name; span.title = f.name;
+          const btn = document.createElement('button'); btn.innerHTML = '&times;'; btn.title = LANG==='cs'?'Odebrat':'Remove';
+          btn.addEventListener('click', () => {
+            fileHandles.splice(i, 1);
+            $('#srvFileCount').textContent = `${fileHandles.length} souborů`;
+            renderPickedFiles();
+          });
+          chip.appendChild(span); chip.appendChild(btn); box.appendChild(chip);
+        });
       }
     }
 
@@ -2007,16 +2043,17 @@ th { background:#f1f5f9; text-align:left; }
       $('#srvSerial').addEventListener('change', updateStatusButtons);
       $('#srvPickPhotos').addEventListener('click', async () => {
         try {
-          photoHandles = await window.showOpenFilePicker({ multiple: true, types: [{ description: 'Obrázky', accept: { 'image/*':['.png','.jpg','.jpeg','.webp'] } }] });
+          const pickedPhotos = await window.showOpenFilePicker({ multiple: true, types: [{ description: 'Obrázky', accept: { 'image/*':['.png','.jpg','.jpeg','.webp'] } }] });
+          photoHandles = [...photoHandles, ...pickedPhotos];
           $('#srvPhotoCount').textContent = `${photoHandles.length} souborů`; await renderPickedPreviews();
         } catch(e) {}
       });
       $('#srvPickFiles').addEventListener('click', async ()=>{
         try {
-          fileHandles = await window.showOpenFilePicker({ multiple:true });
+          const picked = await window.showOpenFilePicker({ multiple:true });
+          fileHandles = [...fileHandles, ...picked];
           $('#srvFileCount').textContent = `${fileHandles.length} souborů`;
-          const names=[]; for (const h of fileHandles){ const f = await h.getFile(); names.push(f.name); }
-          $('#srvFileList').textContent = names.join(', ');
+          renderPickedFiles();
         } catch(e){}
       });
       $('#srvSave').addEventListener('click', saveServisRecord);
