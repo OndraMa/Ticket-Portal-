@@ -1541,6 +1541,8 @@ function computeOutOfServiceDetail() {
 
   active.forEach((r, serial) => {
     const episode = getMaintenanceEpisode(serial);
+    // Nejnovější záznam epizody (pro techniky a detail)
+    const latestRec = episode.length > 0 ? episode[0] : r;
     // Nejstarší záznam v epizodě = první "Dán do údržby" = začátek výpadku
     const oldest = episode.length > 0 ? episode[episode.length - 1] : r;
     const days = Math.max(
@@ -1550,9 +1552,9 @@ function computeOutOfServiceDetail() {
 
     out[r.type].push({
       serial,
-      tech: latest.tech || "",
+      tech: Array.isArray(latestRec.tech) ? latestRec.tech.join(", ") : (latestRec.tech || ""),
       days,
-      latest,
+      latest: latestRec,
       episode
     });
   });
