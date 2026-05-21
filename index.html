@@ -1518,23 +1518,20 @@ function sortNewestFirst(a, b) {
   return tsKey(b).localeCompare(tsKey(a));
 }    
 function getActiveMaintenanceSerials() {
-  // Pro každý serial najdi poslední záznam s back===true nebo back===false
+  // Pro každý serial najdi POSLEDNÍ záznam kde back !== null (ignorujeme neutrální záznamy)
   // Robot je aktivně mimo provoz pouze pokud jeho POSLEDNÍ relevantní stav je back===false
   const latest = new Map();
   const rows = [...servis]
-    .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial)
+    .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial && r.back !== null && r.back !== undefined)
     .sort(sortNewestFirst);
 
   for (const r of rows) {
-    if (latest.has(r.serial)) continue;
-    // Vezmi jen roboty jejichž nejnovější relevantní stav je back===false
-    if (r.back === false || r.back === true) {
-      if (r.back === false) latest.set(r.serial, r);
-      else latest.set(r.serial, null); // back===true => robot je zpět, přeskočit
-    }
+    if (latest.has(r.serial)) continue; // již máme nejnovější relevantní stav
+    if (r.back === false) latest.set(r.serial, r);       // mimo provoz
+    else latest.set(r.serial, null);                     // back===true => vrácen, přeskočit
   }
 
-  // Odfiltruj nullové záznamy (opravení roboti)
+  // Odfiltruj null (vrácení roboti)
   latest.forEach((v, k) => { if (v === null) latest.delete(k); });
   return latest;
 }    
@@ -1544,10 +1541,11 @@ function computeOutOfServiceDetail() {
 
   active.forEach((r, serial) => {
     const episode = getMaintenanceEpisode(serial);
-    const latest = episode[0] || r;
+    // Nejstarší záznam v epizodě = první "Dán do údržby" = začátek výpadku
+    const oldest = episode.length > 0 ? episode[episode.length - 1] : r;
     const days = Math.max(
       0,
-      Math.floor((Date.now() - new Date(`${latest.date}T00:00:00`)) / 86400000)
+      Math.floor((Date.now() - new Date(`${oldest.date}T00:00:00`)) / 86400000)
     );
 
     out[r.type].push({
@@ -1805,7 +1803,10 @@ function renderMaintenance() {
 
     function lastStateFor(type, serial){
       if (!serial) return null;
-      const last = [...servis].reverse().find(r=> r.serial===serial && r.type===type);
+      // Hledáme poslední záznam kde back není null (ignorujeme neutrální záznamy)
+      const last = [...servis]
+        .sort((a,b) => tsKey(b).localeCompare(tsKey(a)))
+        .find(r => r.serial === serial && r.type === type && r.back !== null && r.back !== undefined);
       return last ? last.back : null;
     }
     function updateStatusButtons(){
