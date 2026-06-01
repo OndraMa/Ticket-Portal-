@@ -259,7 +259,7 @@
         <div class="grid grid-2">
           <!-- ŘÁDEK 1: Typ robota | Sériové číslo -->
           <div>
-            <label>Typ robota <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+            <label data-i18n="form_type">Typ robota <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
             <select id="srvType">
               <option value="Jiné">Jiné/Ostatní</option>
               <option value="RS11">RS11</option>
@@ -267,7 +267,7 @@
             </select>
           </div>
           <div id="srvSerialWrap">
-            <label id="srvSerialLabel">Sériové číslo</label>
+            <label id="srvSerialLabel" data-i18n="form_serial">Sériové číslo</label>
             <!-- Multi-select custom dropdown -->
             <div id="srvSerialMultiWrap" style="position:relative;">
               <button type="button" id="srvSerialToggle" class="btn" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:400;background:var(--input-bg,var(--card));border:1px solid var(--border);border-radius:10px;" disabled>
@@ -307,18 +307,18 @@
 
         <!-- ŘÁDEK 3: Nadpis úkonu – celý řádek -->
         <div style="margin-top:12px;">
-          <label>Nadpis úkonu <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+          <label data-i18n="form_headline">Nadpis úkonu <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
           <input id="srvTitle" type="text" placeholder="" />
         </div>
 
         <!-- ŘÁDEK 4: Geek ticket | Geek ticket link -->
         <div class="grid grid-2" style="margin-top:12px;">
           <div>
-            <label>Geek ticket</label>
+            <label data-i18n="form_ticket">Geek ticket</label>
             <input id="srvTicket" type="text" />
           </div>
           <div>
-            <label>Geek ticket link</label>
+            <label data-i18n="form_ticket_link">Geek ticket link</label>
             <input id="srvTicketLink" type="url" placeholder="https://..." />
           </div>
         </div>
@@ -329,14 +329,14 @@
 
         <!-- ŘÁDEK 6: Popis práce – celý řádek -->
         <div style="margin-top:12px;">
-          <label>Popis práce</label>
+          <label data-i18n="form_desc">Popis práce</label>
           <textarea id="srvDesc" rows="4" placeholder=""></textarea>
         </div>
 
         <!-- ŘÁDEK 7: Technik | Externí technik -->
         <div class="grid grid-2" style="margin-top:12px;">
           <div>
-            <label>Technik</label>
+            <label data-i18n="form_tech">Technik</label>
             <div id="srvTechMultiWrap" style="position:relative;">
               <button type="button" id="srvTechToggle" class="btn" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:400;background:var(--input-bg,var(--card));border:1px solid var(--border);border-radius:10px;">
                 <span id="srvTechDisplay">– vyber –</span>
@@ -348,7 +348,7 @@
             </div>
           <div style="display:flex;flex-direction:column;gap:12px;">
             <div>
-              <label>Externí technik</label>
+              <label data-i18n="form_ext_tech">Externí technik</label>
               <input id="srvExtTech" type="text" placeholder="" />
             </div>
             <!-- Fotky a soubory -->
@@ -582,7 +582,7 @@
         service_title: "Servis", service_new: "ZAPSAT ZÁZNAM", service_hist: "HISTORIE",
         form_title: "Nový servisní záznam", form_type: "Typ robota", form_serial: "Sériové číslo", form_date: "Datum", form_time: "Čas", form_pick_photos: "Vybrat fotky…", form_add_files: "Přidat soubory…",
         form_headline: "Nadpis úkonu", form_ticket: "Geek ticket", form_ticket_link: "Geek ticket link", form_part_from_catalog: "Díl z katalogu",
-        form_part_no: "Číslo dílu", form_part_name: "Název dílu", form_desc: "Popis práce", form_tech: "Technik", form_other: "Jiné/Ostatní",
+        form_part_no: "Číslo dílu", form_part_name: "Název dílu", form_desc: "Popis práce", form_tech: "Technik", form_ext_tech: "Externí technik", form_other: "Jiné/Ostatní",
         form_pick_photos: "Vybrat fotky…", form_add_files: "Přidat soubory…", form_auto_folder: "Automatická složka", form_save: "Uložit záznam", form_save_changes: "Uložit změny", form_cancel: "Zrušit úpravy",
         tri_back: "Vrácen do provozu", tri_out: "Dán do údržby",
         hist_title: "Servisní historie", hist_export_csv: "Exportovat do Excel (CSV)", hist_export_pdf: "Tisk / PDF",
@@ -643,7 +643,7 @@
         service_title: "Service", service_new: "ADD RECORD", service_hist: "HISTORY",
         form_title: "New service record", form_type: "Robot type", form_serial: "Serial number", form_date: "Date", form_time: "Time",
         form_headline: "Task title", form_ticket: "Geek ticket", form_ticket_link: "Geek ticket link", form_part_from_catalog: "Part from catalog",
-        form_part_no: "Part number", form_part_name: "Part name", form_desc: "Work description", form_tech: "Technician", form_other: "Other",
+        form_part_no: "Part number", form_part_name: "Part name", form_desc: "Work description", form_tech: "Technician", form_ext_tech: "External technician", form_other: "Other",
         form_pick_photos: "Pick photos…", form_add_files: "Add files…", form_auto_folder: "Auto folder", form_save: "Save record", form_save_changes: "Save changes", form_cancel: "Cancel edit", form_date: "Date", form_time: "Time",
         tri_back: "Returned to operation", tri_out: "Put into maintenance",
         hist_title: "Service history", hist_export_csv: "Export to Excel (CSV)", hist_export_pdf: "Print / PDF",
@@ -978,20 +978,12 @@
       $('#srvMarkOut').textContent = t('tri_out');
       $('#srvSave').textContent = editIndex===-1 ? t('form_save') : t('form_save_changes');
       $('#srvCancelEdit').textContent = t('form_cancel');
-      const formLabels = document.querySelectorAll('#secServisForm label');
-      if (formLabels[0]) formLabels[0].textContent = t('form_type');
-      if (formLabels[1]) formLabels[1].textContent = t('form_serial');
-      if (formLabels[2]) formLabels[2].textContent = t('form_date');
-      if (formLabels[3]) formLabels[3].textContent = t('form_time');
-      if (formLabels[4]) formLabels[4].textContent = t('form_headline');
-      if (formLabels[5]) formLabels[5].textContent = t('form_ticket');
-      if (formLabels[6]) formLabels[6].textContent = t('form_ticket_link');
-      if (formLabels[7]) formLabels[7].textContent = t('form_part_from_catalog');
-      if (formLabels[8]) formLabels[8].textContent = t('form_part_no');
-      if (formLabels[9]) formLabels[9].textContent = t('form_part_name');
-      if (formLabels[10]) formLabels[10].textContent = t('form_desc');
-      if (formLabels[11]) formLabels[11].textContent = t('form_tech');
-      // formLabels[12] is now 'Externistický technik' - handled via HTML, no i18n override needed
+      // Přeložit labely s data-i18n atributem v celém dokumentu
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const val = t(key);
+        if (val && typeof val === 'string') el.textContent = val;
+      });
       const typeOpt = document.querySelector('#srvType option[value="Jiné"]'); if (typeOpt) typeOpt.textContent = t('form_other');
       $('#srvPickPhotos').textContent = t('form_pick_photos');
       $('#srvPickFiles').textContent = t('form_add_files');
@@ -1261,6 +1253,8 @@
       }
       updateSerialDisplay();
       updateStatusButtons();
+      // Obnov filtrování dílů dle nového typu robota
+      refreshPartSelects();
     }
 
     function populatePartSelect() {
@@ -1274,6 +1268,66 @@
     // ═══════════════════════════════════════════
     let partRows = [];  // [{ catalogIdx: -1, partNo: '', partName: '' }, ...]
 
+
+    function refreshPartSelects() {
+      // Obnov všechny katalogové selecty v řádcích dílů po změně typu robota
+      const container = $('#srvPartsContainer');
+      if (!container) return;
+      container.querySelectorAll('.part-catalog-sel').forEach((sel, i) => {
+        const row = partRows[i];
+        const searchInput = sel.closest('[data-part-idx]')?.querySelector('input[type="text"]');
+        const q = searchInput ? searchInput.value : '';
+        fillPartSelect(sel, q, row ? row.catalogIdx : -1);
+      });
+    }
+    function getFilteredParts() {
+      // Vrať díly filtrované podle aktuálně vybraného typu robota
+      const type = $('#srvType') ? $('#srvType').value : '';
+      if (!type || type === 'Jiné' || type === '') return dily.map((p, i) => ({ p, i }));
+      return dily.map((p, i) => ({ p, i })).filter(({ p }) =>
+        !p.robotType || p.robotType === type || p.robotType === 'Jiné' || p.robotType === ''
+      );
+    }
+
+    function fillPartSelect(sel, searchVal, selectedIdx) {
+      // Naplní select díly filtrovanými dle typu + vyhledávání
+      const filtered = getFilteredParts();
+      const q = (searchVal || '').toLowerCase();
+      sel.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '-1';
+      placeholder.textContent = LANG==='cs' ? '— vyber z katalogu —' : '— select from catalog —';
+      sel.appendChild(placeholder);
+
+      if (filtered.length === 0) {
+        const noItems = document.createElement('option');
+        noItems.disabled = true;
+        noItems.textContent = LANG==='cs' ? '(nejprve vyber typ robota)' : '(select robot type first)';
+        sel.appendChild(noItems);
+        return;
+      }
+
+      const type = $('#srvType') ? $('#srvType').value : '';
+      if (!type) {
+        const hint = document.createElement('option');
+        hint.disabled = true;
+        hint.textContent = LANG==='cs' ? '(nejprve vyber typ robota)' : '(select robot type first)';
+        sel.appendChild(hint);
+      }
+
+      filtered.filter(({ p }) => !q ||
+        (p.number||'').toLowerCase().includes(q) ||
+        (p.name||'').toLowerCase().includes(q)
+      ).forEach(({ p, i }) => {
+        const label = `${p.number||'–'} – ${p.name||'–'}${Number.isFinite(p.qty) ? ' ('+p.qty+' '+t('parts_unit')+')' : ''}`;
+        const o = document.createElement('option'); o.value = String(i); o.textContent = label; sel.appendChild(o);
+      });
+
+      // Obnov vybranou hodnotu pokud stále existuje
+      if (selectedIdx >= 0) sel.value = String(selectedIdx);
+      if (sel.value !== String(selectedIdx)) sel.value = '-1';
+    }
+
     function createPartRow(rowData) {
       // rowData = { catalogIdx, partNo, partName } nebo {} pro prázdný řádek
       const idx = partRows.length;
@@ -1282,20 +1336,87 @@
 
       const wrap = document.createElement('div');
       wrap.dataset.partIdx = idx;
-      wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;';
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:var(--surface,rgba(255,255,255,.03));border:1px solid var(--border);border-radius:10px;';
 
-      // Díl z katalogu
+      // Horní řádek: search + select + tlačítko odebrat
+      const topRow = document.createElement('div');
+      topRow.style.cssText = 'display:grid;grid-template-columns:160px 1fr auto;gap:8px;align-items:end;';
+
+      // Vyhledávání v katalogu
+      const searchWrap = document.createElement('div');
+      if (idx === 0) {
+        const searchLabel = document.createElement('label');
+        searchLabel.textContent = LANG==='cs' ? 'Hledat díl' : 'Search part';
+        searchLabel.style.fontSize = '13px';
+        searchWrap.appendChild(searchLabel);
+      }
+      const searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.placeholder = LANG==='cs' ? 'hledat...' : 'search...';
+      searchInput.style.cssText = 'padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg,var(--surface));font-size:13px;width:100%;';
+      searchWrap.appendChild(searchInput);
+
+      // Díl z katalogu select
       const selWrap = document.createElement('div');
-      const selLabel = document.createElement('label');
-      selLabel.textContent = idx === 0 ? (LANG==='cs' ? 'Díl z katalogu' : 'Part from catalog') : '';
+      if (idx === 0) {
+        const selLabel = document.createElement('label');
+        selLabel.dataset.i18n = 'form_part_from_catalog';
+        selLabel.textContent = LANG==='cs' ? 'Díl z katalogu' : 'Part from catalog';
+        selLabel.style.fontSize = '13px';
+        selWrap.appendChild(selLabel);
+      }
       const sel = document.createElement('select');
       sel.className = 'part-catalog-sel';
-      sel.innerHTML = `<option value="-1">${LANG==='cs' ? '— vyber z katalogu —' : '— select from catalog —'}</option>`;
-      dily.forEach((p, i) => {
-        const label = `${p.number||'bez-čísla'} – ${p.name||'bez-názvu'}${Number.isFinite(p.qty) ? ' ('+p.qty+' '+t('parts_unit')+')' : ''}`;
-        const o = document.createElement('option'); o.value = String(i); o.textContent = label; sel.appendChild(o);
-      });
-      sel.value = String(row.catalogIdx);
+      fillPartSelect(sel, '', row.catalogIdx);
+      selWrap.appendChild(sel);
+
+      // Tlačítko odebrat
+      const removeWrap = document.createElement('div');
+      if (idx === 0) {
+        // spacer pro alignment s labelem
+        const spacer = document.createElement('div'); spacer.style.height = '22px'; removeWrap.appendChild(spacer);
+      }
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.title = LANG==='cs' ? 'Odebrat díl' : 'Remove part';
+      removeBtn.style.cssText = 'width:32px;height:32px;border-radius:50%;background:var(--danger,#e05252);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+      removeBtn.addEventListener('click', () => removePartRow(idx));
+      removeWrap.appendChild(removeBtn);
+
+      topRow.appendChild(searchWrap); topRow.appendChild(selWrap); topRow.appendChild(removeWrap);
+
+      // Dolní řádek: Číslo dílu | Název dílu
+      const bottomRow = document.createElement('div');
+      bottomRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+
+      // Číslo dílu
+      const noWrap = document.createElement('div');
+      const noLabel = document.createElement('label');
+      noLabel.dataset.i18n = 'form_part_no';
+      noLabel.textContent = LANG==='cs' ? 'Číslo dílu' : 'Part number';
+      noLabel.style.fontSize = '13px';
+      const noInput = document.createElement('input');
+      noInput.type = 'text'; noInput.value = row.partNo;
+      noInput.placeholder = t('ph_part_catalog') || '';
+      noInput.addEventListener('input', () => { row.partNo = noInput.value; row.catalogIdx = -1; sel.value = '-1'; });
+      noWrap.appendChild(noLabel); noWrap.appendChild(noInput);
+
+      // Název dílu
+      const nameWrap = document.createElement('div');
+      const nameLabel = document.createElement('label');
+      nameLabel.dataset.i18n = 'form_part_name';
+      nameLabel.textContent = LANG==='cs' ? 'Název dílu' : 'Part name';
+      nameLabel.style.fontSize = '13px';
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text'; nameInput.value = row.partName;
+      nameInput.placeholder = t('ph_part_catalog') || '';
+      nameInput.addEventListener('input', () => { row.partName = nameInput.value; row.catalogIdx = -1; sel.value = '-1'; });
+      nameWrap.appendChild(nameLabel); nameWrap.appendChild(nameInput);
+
+      bottomRow.appendChild(noWrap); bottomRow.appendChild(nameWrap);
+
+      // Napoj select → vstupy
       sel.addEventListener('change', () => {
         const i = Number(sel.value);
         row.catalogIdx = i;
@@ -1309,40 +1430,13 @@
           row.partName = nameInput.value;
         }
       });
-      selWrap.appendChild(selLabel); selWrap.appendChild(sel);
 
-      // Číslo dílu
-      const noWrap = document.createElement('div');
-      const noLabel = document.createElement('label');
-      noLabel.textContent = idx === 0 ? (LANG==='cs' ? 'Číslo dílu' : 'Part number') : '';
-      const noInput = document.createElement('input');
-      noInput.type = 'text'; noInput.value = row.partNo;
-      noInput.placeholder = t('ph_part_catalog') || '';
-      noInput.addEventListener('input', () => { row.partNo = noInput.value; row.catalogIdx = -1; sel.value = '-1'; });
-      noWrap.appendChild(noLabel); noWrap.appendChild(noInput);
+      // Search input filtruje select
+      searchInput.addEventListener('input', () => {
+        fillPartSelect(sel, searchInput.value, row.catalogIdx);
+      });
 
-      // Název dílu
-      const nameWrap = document.createElement('div');
-      const nameLabel = document.createElement('label');
-      nameLabel.textContent = idx === 0 ? (LANG==='cs' ? 'Název dílu' : 'Part name') : '';
-      const nameInput = document.createElement('input');
-      nameInput.type = 'text'; nameInput.value = row.partName;
-      nameInput.placeholder = t('ph_part_catalog') || '';
-      nameInput.addEventListener('input', () => { row.partName = nameInput.value; row.catalogIdx = -1; sel.value = '-1'; });
-      nameWrap.appendChild(nameLabel); nameWrap.appendChild(nameInput);
-
-      // Tlačítko odebrat (skryté u prvního řádku pokud je jen jeden)
-      const removeWrap = document.createElement('div');
-      removeWrap.style.paddingBottom = '2px';
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.innerHTML = '&times;';
-      removeBtn.title = LANG==='cs' ? 'Odebrat díl' : 'Remove part';
-      removeBtn.style.cssText = 'width:32px;height:32px;border-radius:50%;background:var(--danger,#e05252);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;';
-      removeBtn.addEventListener('click', () => removePartRow(idx));
-      removeWrap.appendChild(removeBtn);
-
-      wrap.appendChild(selWrap); wrap.appendChild(noWrap); wrap.appendChild(nameWrap); wrap.appendChild(removeWrap);
+      wrap.appendChild(topRow); wrap.appendChild(bottomRow);
 
       const container = $('#srvPartsContainer');
       if (container) container.appendChild(wrap);
