@@ -267,20 +267,37 @@
             </select>
           </div>
           <div id="srvSerialWrap">
-            <label>Sériové číslo</label>
-            <select id="srvSerial"></select>
+            <label id="srvSerialLabel">Sériové číslo</label>
+            <!-- Multi-select custom dropdown -->
+            <div id="srvSerialMultiWrap" style="position:relative;">
+              <button type="button" id="srvSerialToggle" class="btn" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:400;background:var(--input-bg,var(--card));border:1px solid var(--border);border-radius:10px;" disabled>
+                <span id="srvSerialDisplay">— N/A —</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="srvSerialDropdown" class="hidden" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 4px;max-height:220px;overflow-y:auto;box-shadow:0 4px 24px #0006;">
+                <div style="padding:4px 8px 6px;">
+                  <input id="srvSerialSearch" type="text" placeholder="Hledat..." style="width:100%;padding:5px 8px;border-radius:7px;border:1px solid var(--border);background:var(--input-bg,var(--surface));font-size:13px;" />
+                </div>
+                <div id="srvSerialList"></div>
+                <div style="padding:6px 8px 2px;border-top:1px solid var(--border);margin-top:4px;display:flex;gap:8px;">
+                  <button type="button" id="srvSerialSelAll" class="btn" style="font-size:12px;padding:3px 10px;">Vše</button>
+                  <button type="button" id="srvSerialSelNone" class="btn" style="font-size:12px;padding:3px 10px;">Žádné</button>
+                </div>
+              </div>
+            </div>
+            <!-- Skrytý hidden input neslouží, stav drží JS pole selectedSerials -->
           </div>
 
           <!-- ŘÁDEK 2: Datum | Čas -->
           <div>
-            <label>Datum <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+            <label><span data-i18n="form_date">Datum</span> <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
             <div class="input-icon-wrap">
               <input id="srvDate" type="date" />
               <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </div>
           </div>
           <div>
-            <label>Čas <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+            <label><span data-i18n="form_time">Čas</span> <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
             <div class="input-icon-wrap">
               <input id="srvTime" type="time" />
               <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 15"></polyline></svg>
@@ -332,14 +349,15 @@
         <div class="grid grid-2" style="margin-top:12px;">
           <div>
             <label>Technik</label>
-            <select id="srvTech" multiple size="5" style="min-height:130px;padding:8px;">
-              <option>Ondřej Machač</option>
-              <option>Michal Prosecký</option>
-              <option>Lukáš Kubiš</option>
-              <option>Jan Priesol</option>
-            </select>
-            <p class="soft" style="margin-top:5px;font-size:.8rem;">Ctrl / Shift pro výběr více</p>
-          </div>
+            <div id="srvTechMultiWrap" style="position:relative;">
+              <button type="button" id="srvTechToggle" class="btn" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:400;background:var(--input-bg,var(--card));border:1px solid var(--border);border-radius:10px;">
+                <span id="srvTechDisplay">– vyber –</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="srvTechDropdown" class="hidden" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 4px;max-height:220px;overflow-y:auto;box-shadow:0 4px 24px #0006;">
+                <div id="srvTechList"></div>
+              </div>
+            </div>
           <div style="display:flex;flex-direction:column;gap:12px;">
             <div>
               <label>Externí technik</label>
@@ -364,8 +382,14 @@
 
         <div class="divider" style="margin-top:16px;"></div>
         <div class="row" style="justify-content:space-between; align-items:center; margin-top:12px;">
-          <button id="srvMarkBack" type="button" class="btn">Vrácen do provozu</button>
-          <button id="srvMarkOut" type="button" class="btn">Dán do údržby</button>
+          <div>
+            <button id="srvMarkBack" type="button" class="btn">Vrácen do provozu</button>
+            <span id="srvMarkBackHint" class="soft" style="font-size:12px;margin-left:6px;"></span>
+          </div>
+          <div>
+            <button id="srvMarkOut" type="button" class="btn">Dán do údržby</button>
+            <span id="srvMarkOutHint" class="soft" style="font-size:12px;margin-left:6px;"></span>
+          </div>
         </div>
         <div class="row" style="justify-content:flex-end; margin-top:12px;">
           <button id="srvSave" class="btn">Uložit záznam</button>
@@ -568,7 +592,7 @@
         maint_no_records: "Žádné detailní záznamy.",
         gate_btn: "Vybrat složku /data",
         service_title: "Servis", service_new: "ZAPSAT ZÁZNAM", service_hist: "HISTORIE",
-        form_title: "Nový servisní záznam", form_type: "Typ robota", form_serial: "Sériové číslo", form_date: "Datum", form_time: "Čas",
+        form_title: "Nový servisní záznam", form_type: "Typ robota", form_serial: "Sériové číslo", form_date: "Datum", form_time: "Čas", form_pick_photos: "Vybrat fotky…", form_add_files: "Přidat soubory…",
         form_headline: "Nadpis úkonu", form_ticket: "Geek ticket", form_ticket_link: "Geek ticket link", form_part_from_catalog: "Díl z katalogu",
         form_part_no: "Číslo dílu", form_part_name: "Název dílu", form_desc: "Popis práce", form_tech: "Technik", form_other: "Jiné/Ostatní",
         form_pick_photos: "Vybrat fotky…", form_add_files: "Přidat soubory…", form_auto_folder: "Automatická složka", form_save: "Uložit záznam", form_save_changes: "Uložit změny", form_cancel: "Zrušit úpravy",
@@ -632,7 +656,7 @@
         form_title: "New service record", form_type: "Robot type", form_serial: "Serial number", form_date: "Date", form_time: "Time",
         form_headline: "Task title", form_ticket: "Geek ticket", form_ticket_link: "Geek ticket link", form_part_from_catalog: "Part from catalog",
         form_part_no: "Part number", form_part_name: "Part name", form_desc: "Work description", form_tech: "Technician", form_other: "Other",
-        form_pick_photos: "Pick photos…", form_add_files: "Add files…", form_auto_folder: "Auto folder", form_save: "Save record", form_save_changes: "Save changes", form_cancel: "Cancel edit",
+        form_pick_photos: "Pick photos…", form_add_files: "Add files…", form_auto_folder: "Auto folder", form_save: "Save record", form_save_changes: "Save changes", form_cancel: "Cancel edit", form_date: "Date", form_time: "Time",
         tri_back: "Returned to operation", tri_out: "Put into maintenance",
         hist_title: "Service history", hist_export_csv: "Export to Excel (CSV)", hist_export_pdf: "Print / PDF",
         filter_search: "Search", filter_type: "Type", filter_status: "Status", filter_tech: "Technician", filter_from: "From date", filter_to: "To date", filter_sort: "Sort", filter_clear: "Clear filters",
@@ -1057,6 +1081,9 @@
       if (allFormLabels[12]) allFormLabels[12].textContent = t('form_ext_tech');
       // Placeholdery formuláře
       if ($('#srvTitle'))    $('#srvTitle').placeholder    = t('ph_title');
+      // Multi-select placeholdery
+      if (!selectedTechs.length) updateTechDisplay();
+      if (!selectedSerials.length) updateSerialDisplay();
       if ($('#srvPartNo'))   $('#srvPartNo').placeholder   = t('ph_part_catalog');
       if ($('#srvPartName')) $('#srvPartName').placeholder = t('ph_part_catalog');
       if ($('#srvDesc'))     $('#srvDesc').placeholder     = t('ph_desc');
@@ -1115,18 +1142,128 @@
       });
     }
 
+    // === MULTI-SELECT SERIALS ===
+    let selectedSerials = [];
+
+    function updateSerialDisplay() {
+      const disp = $('#srvSerialDisplay');
+      if (!disp) return;
+      if (!selectedSerials.length) {
+        disp.textContent = LANG==='cs' ? '– vyber –' : '– select –';
+      } else {
+        // Vždy zobrazit konkrétní čísla oddělená čárkou
+        disp.textContent = selectedSerials.join(', ');
+        // Pokud je text příliš dlouhý, zkrátit vizuálně (CSS text-overflow)
+        disp.style.overflow = 'hidden';
+        disp.style.textOverflow = 'ellipsis';
+        disp.style.whiteSpace = 'nowrap';
+        disp.style.maxWidth = 'calc(100% - 20px)';
+      }
+    }
+
+    function renderSerialList(filter) {
+      const type = $('#srvType').value;
+      const src = type==='RS11' ? RS11 : type==='P40' ? P40 : [];
+      const q = (filter||'').toLowerCase();
+      const list = $('#srvSerialList');
+      if (!list) return;
+      list.innerHTML = '';
+      src.filter(s => !q || s.toLowerCase().includes(q)).forEach(s => {
+        const checked = selectedSerials.includes(s);
+        const item = document.createElement('label');
+        item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer;border-radius:7px;user-select:none;';
+        item.onmouseenter = () => item.style.background = 'var(--hover-bg,rgba(255,255,255,.06))';
+        item.onmouseleave = () => item.style.background = '';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = s; cb.checked = checked;
+        cb.style.cssText = 'width:15px;height:15px;accent-color:var(--accent,#3b82f6);cursor:pointer;';
+        cb.addEventListener('change', () => {
+          if (cb.checked) { if (!selectedSerials.includes(s)) selectedSerials.push(s); }
+          else { selectedSerials = selectedSerials.filter(x => x !== s); }
+          updateSerialDisplay();
+          updateStatusButtons();
+        });
+        const span = document.createElement('span');
+        span.textContent = s;
+        span.style.fontSize = '14px';
+        item.appendChild(cb); item.appendChild(span);
+        list.appendChild(item);
+      });
+    }
+
+
+    // === MULTI-SELECT TECHNIK ===
+    let selectedTechs = [];
+
+    function getTechNames() {
+      // Vytáhni techniky z existujících záznamů (stejně jako populateTechFilter)
+      const names = new Set();
+      servis.forEach(r => {
+        const arr = Array.isArray(r.tech) ? r.tech : (r.tech ? String(r.tech).split(',') : []);
+        arr.forEach(n => { const t = n.trim(); if (t) names.add(t); });
+      });
+      // Fallback – statický seznam pokud nejsou žádná data
+      if (!names.size) {
+        ['Ondřej Machač','Michal Prosecký','Lukáš Kubiš','Jan Priesol'].forEach(n => names.add(n));
+      }
+      return [...names].sort((a,b) => a.localeCompare(b, 'cs'));
+    }
+
+    function updateTechDisplay() {
+      const disp = $('#srvTechDisplay');
+      if (!disp) return;
+      if (!selectedTechs.length) {
+        disp.textContent = LANG==='cs' ? '– vyber –' : '– select –';
+      } else {
+        disp.textContent = selectedTechs.join(', ');
+        disp.style.overflow = 'hidden';
+        disp.style.textOverflow = 'ellipsis';
+        disp.style.whiteSpace = 'nowrap';
+        disp.style.maxWidth = 'calc(100% - 20px)';
+      }
+    }
+
+    function renderTechList() {
+      const list = $('#srvTechList');
+      if (!list) return;
+      list.innerHTML = '';
+      getTechNames().forEach(name => {
+        const checked = selectedTechs.includes(name);
+        const item = document.createElement('label');
+        item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer;border-radius:7px;user-select:none;';
+        item.onmouseenter = () => item.style.background = 'var(--hover-bg,rgba(255,255,255,.06))';
+        item.onmouseleave = () => item.style.background = '';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = name; cb.checked = checked;
+        cb.style.cssText = 'width:15px;height:15px;accent-color:var(--accent,#3b82f6);cursor:pointer;';
+        cb.addEventListener('change', () => {
+          if (cb.checked) { if (!selectedTechs.includes(name)) selectedTechs.push(name); }
+          else { selectedTechs = selectedTechs.filter(x => x !== name); }
+          updateTechDisplay();
+        });
+        const span = document.createElement('span');
+        span.textContent = name;
+        span.style.fontSize = '14px';
+        item.appendChild(cb); item.appendChild(span);
+        list.appendChild(item);
+      });
+    }
+
     function rebuildSerials() {
       const type = $('#srvType').value;
-      const sel = $('#srvSerial');
-      sel.innerHTML = '';
+      const toggle = $('#srvSerialToggle');
+      selectedSerials = [];
       if (type === 'RS11' || type === 'P40') {
-        sel.disabled = false;
-        const src = type==='RS11' ? RS11 : P40;
-        sel.innerHTML = '<option value=\"\">– vyber –</option>' + src.map(s=>`<option>${s}</option>`).join('');
+        if (toggle) toggle.disabled = false;
+        renderSerialList('');
       } else {
-        sel.disabled = true;
-        sel.innerHTML = '<option value=\"\">— N/A —</option>';
+        if (toggle) toggle.disabled = true;
+        const list = $('#srvSerialList');
+        if (list) list.innerHTML = '';
+        const dd = $('#srvSerialDropdown');
+        if (dd) dd.classList.add('hidden');
       }
+      updateSerialDisplay();
       updateStatusButtons();
     }
 
@@ -1151,7 +1288,7 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           photoHandles.splice(i, 1);
-          $('#srvPhotoCount').textContent = `${photoHandles.length} souborů`;
+          $('#srvPhotoCount').textContent = t('files_count')(photoHandles.length);
           renderPickedPreviews();
         });
         wrap.appendChild(img); wrap.appendChild(btn); box.appendChild(wrap);
@@ -1168,7 +1305,7 @@
           const btn = document.createElement('button'); btn.innerHTML = '&times;'; btn.title = LANG==='cs'?'Odebrat':'Remove';
           btn.addEventListener('click', () => {
             fileHandles.splice(i, 1);
-            $('#srvFileCount').textContent = `${fileHandles.length} souborů`;
+            $('#srvFileCount').textContent = t('files_count')(fileHandles.length);
             renderPickedFiles();
           });
           chip.appendChild(span); chip.appendChild(btn); box.appendChild(chip);
@@ -1177,32 +1314,33 @@
     }
 
     function validateServisForm() {
-      ['srvType','srvSerial','srvDate','srvTime','srvTitle','srvDesc','srvTech'].forEach(id=>{
+      ['srvType','srvDate','srvTime','srvTitle','srvDesc'].forEach(id=>{
         const el=document.getElementById(id); if(el) el.parentElement.classList.remove('field-error');
       });
       const missing=[];
       const type=$('#srvType').value;
       if(!type){missing.push(LANG==='cs'?'Typ robota':'Robot type');$('#srvType').parentElement.classList.add('field-error');}
-      if((type==='RS11'||type==='P40')&&!$('#srvSerial').value){missing.push(LANG==='cs'?'Sériové číslo':'Serial number');$('#srvSerial').parentElement.classList.add('field-error');}
+      if((type==='RS11'||type==='P40')&&!selectedSerials.length){missing.push(LANG==='cs'?'Sériové číslo (vyberte alespoň jedno)':'Serial number (select at least one)');$('#srvSerialWrap').classList.add('field-error');}
       if(!$('#srvDate').value){missing.push(LANG==='cs'?'Datum':'Date');$('#srvDate').parentElement.classList.add('field-error');}
       if(!$('#srvTime').value){missing.push(LANG==='cs'?'Čas':'Time');$('#srvTime').parentElement.classList.add('field-error');}
       if(!$('#srvTitle').value.trim()){missing.push(LANG==='cs'?'Nadpis úkonu':'Task title');$('#srvTitle').parentElement.classList.add('field-error');}
       if(!$('#srvDesc').value.trim()){missing.push(LANG==='cs'?'Popis práce':'Work description');$('#srvDesc').parentElement.classList.add('field-error');}
-      if(!Array.from($('#srvTech').options).some(o=>o.selected)){missing.push(LANG==='cs'?'Technik':'Technician');$('#srvTech').parentElement.classList.add('field-error');}
+      if(!selectedTechs.length){missing.push(LANG==='cs'?'Technik':'Technician');const tw=$('#srvTechMultiWrap');if(tw)tw.classList.add('field-error');}
       if(missing.length) return (LANG==='cs'?'Chybí vyplnit: ':'Missing: ')+missing.join(', ');
       return '';
     }
 
     function resetFormOnlyPhotos() {
-      photoHandles=[]; $('#srvPhotoPreview').innerHTML=''; $('#srvPhotoCount').textContent='0 souborů';
-      fileHandles=[]; $('#srvFileCount').textContent='0 souborů'; $('#srvFileList').innerHTML='';
+      photoHandles=[]; $('#srvPhotoPreview').innerHTML=''; $('#srvPhotoCount').textContent=t('files_count')(0);
+      fileHandles=[]; $('#srvFileCount').textContent=t('files_count')(0); $('#srvFileList').innerHTML='';
       $('#srvDate').value='niceNow().date';
       $('#srvTime').value='niceNow().time';
       $('#srvType').value='Jiné';
       $('#srvFolder').value='';
       $('#srvTitle').value = ''; $('#srvTicket').value='';
       $('#srvTicketLink').value=''; $('#srvPartNo').value=''; $('#srvPartName').value='';
-      $('#srvDesc').value=''; $('#srvTech').value='';
+      $('#srvDesc').value='';
+      selectedTechs = []; renderTechList(); updateTechDisplay();
       $('#srvPartSelect').value='-1';
       rebuildSerials();
       const extTechEl = document.getElementById('srvExtTech');
@@ -1217,48 +1355,30 @@
       const err = validateServisForm(); if (err) return alert(err);
 
       const type = $('#srvType').value;
-      const serial = (type==='RS11'||type==='P40') ? $('#srvSerial').value : '';
+      // Při editaci = jeden serial, při novém záznamu = selectedSerials (může být více)
+      const serialList = editIndex !== -1
+        ? [servis[editIndex].serial || '']
+        : ((type==='RS11'||type==='P40') ? [...selectedSerials] : ['']);
+
       const date = $('#srvDate').value;
       const time = $('#srvTime').value;
-      let folder = $('#srvFolder').value;
-
-      if (editIndex === -1) {
-        const stamp = date.replaceAll('-','') + '_' + time.replace(':','');
-        folder = `SERV_${type}_${serial || 'NA'}_${stamp}`;
-        $('#srvFolder').value = folder;
-        await dataDir.getDirectoryHandle(folder, {create:true});
-      }
-
-      const dir = await dataDir.getDirectoryHandle(folder, {create:true});
-      const newPhotoNames = []; const newFileNames = [];
-      for (const h of photoHandles) {
-        const f = await h.getFile(); const name = f.name;
-        const outHandle = await dir.getFileHandle(name, {create:true});
-        const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
-        newPhotoNames.push(name);
-      }
-      for (const h of fileHandles) {
-        const f = await h.getFile(); const name = f.name;
-        const outHandle = await dir.getFileHandle(name, {create:true});
-        const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
-        newFileNames.push(name);
-      }
-
       const backVal = (srvStatus==='back'? true : (srvStatus==='out'? false : null));
 
-      const base = {
-        id: folder, type, serial, date, time,
+      const baseFields = {
+        type,
+        date, time,
         title: $('#srvTitle').value.trim(),
         ticket: $('#srvTicket').value.trim(),
-        ticketLink: $('#srvTicketLink').value.trim(),
+        ticketLink: ($('#srvTicketLink')||{value:''}).value.trim(),
         partNo: $('#srvPartNo').value.trim(),
         partName: $('#srvPartName').value.trim(),
         desc: $('#srvDesc').value.trim(),
         back: backVal,
-        tech: Array.from($('#srvTech').selectedOptions).map(o=>o.value).filter(Boolean),
+        tech: [...selectedTechs],
         extTech: ($('#srvExtTech')||{value:''}).value.trim()
       };
 
+      // Odpočet dílu ze skladu (jen jednou, i pro více robotů)
       const selIdx = Number($('#srvPartSelect').value);
       if (Number.isFinite(selIdx) && selIdx >= 0 && selIdx < dily.length) {
         if ((dily[selIdx].qty||0) > 0) {
@@ -1270,17 +1390,83 @@
         }
       }
 
-      if (editIndex === -1) {
-        base.photos = newPhotoNames; base.files = newFileNames; servis.unshift(base);
-      } else {
-        const existing = servis[editIndex]; base.photos = [...(existing.photos||[]) , ...newPhotoNames]; base.files = [...(existing.files||[]), ...newFileNames]; servis[editIndex] = base;
+      // Kopírujeme soubory/fotky jen jednou (nebo pro každý serial – dle preferencí)
+      // Pro jednoduchost: soubory/fotky zapíšeme do složky prvního robota, ostatní dostanou odkaz
+      const firstSerial = serialList[0];
+      const stamp = date.replaceAll('-','') + '_' + time.replace(':','');
+
+      if (editIndex !== -1) {
+        // ── EDITACE – jeden záznam ──────────────────────────────────────────────
+        let folder = $('#srvFolder').value;
+        const dir = await dataDir.getDirectoryHandle(folder, {create:true});
+        const newPhotoNames = []; const newFileNames = [];
+        for (const h of photoHandles) {
+          const f = await h.getFile(); const name = f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newPhotoNames.push(name);
+        }
+        for (const h of fileHandles) {
+          const f = await h.getFile(); const name = f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newFileNames.push(name);
+        }
+        const existing = servis[editIndex];
+        servis[editIndex] = {
+          ...existing, ...baseFields,
+          serial: firstSerial,
+          id: folder,
+          photos: [...(existing.photos||[]), ...newPhotoNames],
+          files: [...(existing.files||[]), ...newFileNames]
+        };
+        await writeJSON('servisni.json', servis);
+        const n = niceNow(); $('#srvDate').value = n.date; $('#srvTime').value = n.time;
+        resetFormOnlyPhotos(); renderServisList(); renderMaintenance(); refreshKPIs();
+        alert(t('alert_updated'));
+        goto('secServisHist');
+        return;
+      }
+
+      // ── NOVÝ ZÁZNAM – jeden nebo více serialů ──────────────────────────────────
+      // Soubory/fotky zapíšeme pro každý serial zvlášť (kopie do každé složky)
+      for (let si = 0; si < serialList.length; si++) {
+        const serial = serialList[si];
+        const folder = `SERV_${type}_${serial || 'NA'}_${stamp}${serialList.length > 1 ? '_'+si : ''}`;
+        await dataDir.getDirectoryHandle(folder, {create:true});
+        const dir = await dataDir.getDirectoryHandle(folder, {create:true});
+
+        const newPhotoNames = []; const newFileNames = [];
+        for (const h of photoHandles) {
+          const f = await h.getFile(); const name = f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newPhotoNames.push(name);
+        }
+        for (const h of fileHandles) {
+          const f = await h.getFile(); const name = f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newFileNames.push(name);
+        }
+
+        const record = {
+          ...baseFields,
+          serial,
+          id: folder,
+          photos: newPhotoNames,
+          files: newFileNames
+        };
+        servis.unshift(record);
       }
 
       await writeJSON('servisni.json', servis);
-
       const n = niceNow(); $('#srvDate').value = n.date; $('#srvTime').value = n.time;
       resetFormOnlyPhotos(); renderServisList(); renderMaintenance(); refreshKPIs();
-      alert(editIndex === -1 ? t('alert_saved') : t('alert_updated'));
+      const count = serialList.length;
+      alert(count > 1
+        ? (LANG==='cs' ? `Uloženo ${count} záznamů (${serialList.join(', ')})` : `Saved ${count} records (${serialList.join(', ')})`)
+        : t('alert_saved'));
       goto('secServisHist');
     }
 
@@ -1289,16 +1475,19 @@
       editIndex = idx; goto('secServisForm');
       $('#srvSave').textContent = t('form_save_changes'); $('#srvCancelEdit').classList.remove('hidden');
       $('#srvType').value = r.type || 'Jiné'; rebuildSerials();
-      if (r.serial) $('#srvSerial').value = r.serial;
+      if (r.serial) { selectedSerials = [r.serial]; renderSerialList(''); updateSerialDisplay(); }
       $('#srvDate').value = r.date || ''; $('#srvTime').value = r.time || '';
       $('#srvTitle').value = r.title || ''; $('#srvTicket').value = r.ticket || ''; $('#srvTicketLink').value = r.ticketLink || ''; if($('#srvExtTech')) $('#srvExtTech').value = r.extTech || '';
       $('#srvPartNo').value = r.partNo || ''; $('#srvPartName').value = r.partName || '';
-      $('#srvDesc').value = r.desc || ''; $('#srvTech').value = r.tech || '';
+      $('#srvDesc').value = r.desc || '';
+      // Načti techniky do multi-select
+      selectedTechs = Array.isArray(r.tech) ? [...r.tech] : (r.tech ? String(r.tech).split(',').map(s=>s.trim()).filter(Boolean) : []);
+      renderTechList(); updateTechDisplay();
       $('#srvFolder').value = r.id || ''; $('#srvPartSelect').value = '-1';
       srvStatus = (r.back===true)?'back':(r.back===false?'out':'none');
       $('#srvMarkBack').classList.toggle('primary', srvStatus==='back');
       $('#srvMarkOut').classList.toggle('primary', srvStatus==='out');
-      photoHandles=[]; fileHandles=[]; $('#srvPhotoPreview').innerHTML=''; $('#srvPhotoCount').textContent='0 souborů'; $('#srvFileCount').textContent='0 souborů'; $('#srvFileList').innerHTML='';
+      photoHandles=[]; fileHandles=[]; $('#srvPhotoPreview').innerHTML=''; $('#srvPhotoCount').textContent=t('files_count')(0); $('#srvFileCount').textContent=t('files_count')(0); $('#srvFileList').innerHTML='';
       window.scrollTo({top:0, behavior:'smooth'});
       updateStatusButtons();
     }
@@ -1812,11 +2001,50 @@ function renderMaintenance() {
       return last ? last.back : null;
     }
     function updateStatusButtons(){
-      const type=$('#srvType').value, serial=$('#srvSerial').value;
-      const last = lastStateFor(type, serial);
-      const isOut = (last===false);
-      $('#srvMarkBack').disabled = !isOut;
-      $('#srvMarkOut').disabled = isOut;
+      const type = $('#srvType').value;
+      const btnBack = $('#srvMarkBack'), btnOut = $('#srvMarkOut');
+      const hintBack = $('#srvMarkBackHint'), hintOut = $('#srvMarkOutHint');
+
+      if (type !== 'RS11' && type !== 'P40') {
+        // Typ "Jiné" – tlačítka normálně dostupná
+        if(btnBack) btnBack.disabled = false;
+        if(btnOut) btnOut.disabled = false;
+        if(hintBack) hintBack.textContent = '';
+        if(hintOut) hintOut.textContent = '';
+        return;
+      }
+
+      if (!selectedSerials.length) {
+        if(btnBack) btnBack.disabled = true;
+        if(btnOut) btnOut.disabled = true;
+        if(hintBack) hintBack.textContent = '';
+        if(hintOut) hintOut.textContent = '';
+        return;
+      }
+
+      // Zjisti stav každého vybraného sériového čísla
+      const states = selectedSerials.map(s => lastStateFor(type, s));
+      // back===false = mimo provoz, back===true = v provozu, null = žádný záznam
+
+      const allOut  = states.every(s => s === false);   // všichni mimo provoz
+      const allBack = states.every(s => s !== false);   // všichni v provozu / bez záznamu
+      const mixed   = !allOut && !allBack;
+
+      // "Vrácen do provozu" – jen pokud jsou VŠICHNI mimo provoz
+      if(btnBack) btnBack.disabled = !allOut;
+      // "Dán do údržby" – jen pokud jsou VŠICHNI v provozu / bez záznamu
+      if(btnOut) btnOut.disabled = !allBack;
+
+      if (hintBack) {
+        if (mixed) hintBack.textContent = '(smíšený stav)';
+        else if (allOut) hintBack.textContent = `(${selectedSerials.length}× mimo provoz)`;
+        else hintBack.textContent = '';
+      }
+      if (hintOut) {
+        if (mixed) hintOut.textContent = '(smíšený stav)';
+        else if (allBack) hintOut.textContent = selectedSerials.length > 1 ? `(${selectedSerials.length}× v provozu)` : '';
+        else hintOut.textContent = '';
+      }
     }
 
     function formatUsedParts(r){
@@ -2043,19 +2271,81 @@ th { background:#f1f5f9; text-align:left; }
       });
 
       $('#srvType').addEventListener('change', rebuildSerials);
-      $('#srvSerial').addEventListener('change', updateStatusButtons);
+      // Multi-select toggle otevřít/zavřít
+      const serialToggle = $('#srvSerialToggle');
+      const serialDropdown = $('#srvSerialDropdown');
+      if (serialToggle) {
+        serialToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          serialDropdown.classList.toggle('hidden');
+          if (!serialDropdown.classList.contains('hidden')) {
+            $('#srvSerialSearch').value = '';
+            renderSerialList('');
+            setTimeout(() => $('#srvSerialSearch').focus(), 50);
+          }
+        });
+      }
+      // Hledání v dropdownu
+      const serialSearch = $('#srvSerialSearch');
+      if (serialSearch) {
+        serialSearch.addEventListener('input', () => renderSerialList(serialSearch.value));
+        serialSearch.addEventListener('click', e => e.stopPropagation());
+      }
+      // Vybrat vše / Žádné
+      const selAll = $('#srvSerialSelAll');
+      const selNone = $('#srvSerialSelNone');
+      if (selAll) selAll.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = $('#srvType').value;
+        selectedSerials = type==='RS11' ? [...RS11] : type==='P40' ? [...P40] : [];
+        renderSerialList($('#srvSerialSearch').value||'');
+        updateSerialDisplay(); updateStatusButtons();
+      });
+      if (selNone) selNone.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedSerials = [];
+        renderSerialList($('#srvSerialSearch').value||'');
+        updateSerialDisplay(); updateStatusButtons();
+      });
+      // Zavřít dropdown kliknutím mimo
+      document.addEventListener('click', (e) => {
+        if (serialDropdown && !$('#srvSerialMultiWrap').contains(e.target)) {
+          serialDropdown.classList.add('hidden');
+        }
+      });
+
+      // Technik multi-select
+      const techToggle = $('#srvTechToggle');
+      const techDropdown = $('#srvTechDropdown');
+      if (techToggle) {
+        techToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Refresh seznamu při otevření (mohou být nová jména z dat)
+          if (techDropdown.classList.contains('hidden')) {
+            renderTechList();
+          }
+          techDropdown.classList.toggle('hidden');
+        });
+      }
+      // Zavřít Technik dropdown kliknutím mimo
+      document.addEventListener('click', (e) => {
+        if (techDropdown && !$('#srvTechMultiWrap').contains(e.target)) {
+          techDropdown.classList.add('hidden');
+        }
+      });
+
       $('#srvPickPhotos').addEventListener('click', async () => {
         try {
           const pickedPhotos = await window.showOpenFilePicker({ multiple: true, types: [{ description: 'Obrázky', accept: { 'image/*':['.png','.jpg','.jpeg','.webp'] } }] });
           photoHandles = [...photoHandles, ...pickedPhotos];
-          $('#srvPhotoCount').textContent = `${photoHandles.length} souborů`; await renderPickedPreviews();
+          $('#srvPhotoCount').textContent = t('files_count')(photoHandles.length); await renderPickedPreviews();
         } catch(e) {}
       });
       $('#srvPickFiles').addEventListener('click', async ()=>{
         try {
           const picked = await window.showOpenFilePicker({ multiple:true });
           fileHandles = [...fileHandles, ...picked];
-          $('#srvFileCount').textContent = `${fileHandles.length} souborů`;
+          $('#srvFileCount').textContent = t('files_count')(fileHandles.length);
           renderPickedFiles();
         } catch(e){}
       });
