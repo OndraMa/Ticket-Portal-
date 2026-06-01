@@ -323,21 +323,9 @@
           </div>
         </div>
 
-        <!-- ŘÁDEK 5: Díl z katalogu | Číslo dílu | Název dílu -->
-        <div class="grid grid-3" style="margin-top:12px;">
-          <div>
-            <label>Díl z katalogu</label>
-            <select id="srvPartSelect"></select>
-          </div>
-          <div>
-            <label>Číslo dílu</label>
-            <input id="srvPartNo" type="text" placeholder="" />
-          </div>
-          <div>
-            <label>Název dílu</label>
-            <input id="srvPartName" type="text" placeholder="" />
-          </div>
-        </div>
+        <!-- ŘÁDEK 5: Díly – dynamický seznam -->
+        <div id="srvPartsContainer" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
+        <button type="button" id="srvAddPart" class="btn" style="margin-top:6px;width:fit-content;font-size:13px;padding:5px 14px;">+ Přidat díl</button>
 
         <!-- ŘÁDEK 6: Popis práce – celý řádek -->
         <div style="margin-top:12px;">
@@ -773,11 +761,16 @@
       const tb=$('#partsHistTable tbody'); if(!tb) return; tb.innerHTML='';
       const rows=[];
       servis.forEach(rec=>{
-        if(!rec.partName&&!rec.partNo) return;
-        rows.push({name:rec.partName||'',number:rec.partNo||'',date:rec.date||'',
-          tech:Array.isArray(rec.tech)?rec.tech.join(', '):(rec.tech||''),
-          serial:(rec.type||'')+(rec.serial?' · '+rec.serial:'')});
-      });
+        // Nový formát: rec.parts = [{ partNo, partName }]
+        const partItems = (Array.isArray(rec.parts) && rec.parts.length > 0 && typeof rec.parts[0] === 'object' && 'partNo' in rec.parts[0])
+          ? rec.parts.filter(p => p.partNo || p.partName)
+          : (rec.partNo || rec.partName ? [{ partNo: rec.partNo||'', partName: rec.partName||'' }] : []);
+        partItems.forEach(pi => {
+          rows.push({name:pi.partName||'',number:pi.partNo||'',date:rec.date||'',
+            tech:Array.isArray(rec.tech)?rec.tech.join(', '):(rec.tech||''),
+            serial:(rec.type||'')+(rec.serial?' · '+rec.serial:'')});
+        });
+      });  // konec servis.forEach
       if(!rows.length){
         tb.innerHTML=`<tr><td colspan="6" class="center muted" style="padding:20px;">${LANG==='cs'?'Žádné záznamy s použitými díly.':'No records with used parts.'}</td></tr>`;
         return;
@@ -1084,6 +1077,9 @@
       // Multi-select placeholdery
       if (!selectedTechs.length) updateTechDisplay();
       if (!selectedSerials.length) updateSerialDisplay();
+      // Přeložit tlačítko přidat díl
+      const addPartBtn = $('#srvAddPart');
+      if (addPartBtn) addPartBtn.textContent = LANG==='cs' ? '+ Přidat díl' : '+ Add part';
       if ($('#srvPartNo'))   $('#srvPartNo').placeholder   = t('ph_part_catalog');
       if ($('#srvPartName')) $('#srvPartName').placeholder = t('ph_part_catalog');
       if ($('#srvDesc'))     $('#srvDesc').placeholder     = t('ph_desc');
@@ -1268,12 +1264,150 @@
     }
 
     function populatePartSelect() {
-      const sel = $('#srvPartSelect');
-      sel.innerHTML = '<option value="-1">— vyber z katalogu —</option>';
+      // Obnoví katalogové selecty v dynamických řádcích dílů
+      resetPartRows();
+    }
+
+
+    // ═══════════════════════════════════════════
+    // MULTI-DÍLY – dynamické řádky ve formuláři
+    // ═══════════════════════════════════════════
+    let partRows = [];  // [{ catalogIdx: -1, partNo: '', partName: '' }, ...]
+
+    function createPartRow(rowData) {
+      // rowData = { catalogIdx, partNo, partName } nebo {} pro prázdný řádek
+      const idx = partRows.length;
+      const row = { catalogIdx: rowData.catalogIdx ?? -1, partNo: rowData.partNo || '', partName: rowData.partName || '' };
+      partRows.push(row);
+
+      const wrap = document.createElement('div');
+      wrap.dataset.partIdx = idx;
+      wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;';
+
+      // Díl z katalogu
+      const selWrap = document.createElement('div');
+      const selLabel = document.createElement('label');
+      selLabel.textContent = idx === 0 ? (LANG==='cs' ? 'Díl z katalogu' : 'Part from catalog') : '';
+      const sel = document.createElement('select');
+      sel.className = 'part-catalog-sel';
+      sel.innerHTML = `<option value="-1">${LANG==='cs' ? '— vyber z katalogu —' : '— select from catalog —'}</option>`;
       dily.forEach((p, i) => {
-        const label = `${p.number || 'bez-čísla'} – ${p.name || 'bez-názvu'}${Number.isFinite(p.qty) ? ' ('+p.qty+' '+t('parts_unit')+')' : ''}`;
+        const label = `${p.number||'bez-čísla'} – ${p.name||'bez-názvu'}${Number.isFinite(p.qty) ? ' ('+p.qty+' '+t('parts_unit')+')' : ''}`;
         const o = document.createElement('option'); o.value = String(i); o.textContent = label; sel.appendChild(o);
       });
+      sel.value = String(row.catalogIdx);
+      sel.addEventListener('change', () => {
+        const i = Number(sel.value);
+        row.catalogIdx = i;
+        if (i >= 0 && i < dily.length) {
+          row.partNo = dily[i].number || '';
+          row.partName = dily[i].name || '';
+          noInput.value = row.partNo;
+          nameInput.value = row.partName;
+        } else {
+          row.partNo = noInput.value;
+          row.partName = nameInput.value;
+        }
+      });
+      selWrap.appendChild(selLabel); selWrap.appendChild(sel);
+
+      // Číslo dílu
+      const noWrap = document.createElement('div');
+      const noLabel = document.createElement('label');
+      noLabel.textContent = idx === 0 ? (LANG==='cs' ? 'Číslo dílu' : 'Part number') : '';
+      const noInput = document.createElement('input');
+      noInput.type = 'text'; noInput.value = row.partNo;
+      noInput.placeholder = t('ph_part_catalog') || '';
+      noInput.addEventListener('input', () => { row.partNo = noInput.value; row.catalogIdx = -1; sel.value = '-1'; });
+      noWrap.appendChild(noLabel); noWrap.appendChild(noInput);
+
+      // Název dílu
+      const nameWrap = document.createElement('div');
+      const nameLabel = document.createElement('label');
+      nameLabel.textContent = idx === 0 ? (LANG==='cs' ? 'Název dílu' : 'Part name') : '';
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text'; nameInput.value = row.partName;
+      nameInput.placeholder = t('ph_part_catalog') || '';
+      nameInput.addEventListener('input', () => { row.partName = nameInput.value; row.catalogIdx = -1; sel.value = '-1'; });
+      nameWrap.appendChild(nameLabel); nameWrap.appendChild(nameInput);
+
+      // Tlačítko odebrat (skryté u prvního řádku pokud je jen jeden)
+      const removeWrap = document.createElement('div');
+      removeWrap.style.paddingBottom = '2px';
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.title = LANG==='cs' ? 'Odebrat díl' : 'Remove part';
+      removeBtn.style.cssText = 'width:32px;height:32px;border-radius:50%;background:var(--danger,#e05252);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;';
+      removeBtn.addEventListener('click', () => removePartRow(idx));
+      removeWrap.appendChild(removeBtn);
+
+      wrap.appendChild(selWrap); wrap.appendChild(noWrap); wrap.appendChild(nameWrap); wrap.appendChild(removeWrap);
+
+      const container = $('#srvPartsContainer');
+      if (container) container.appendChild(wrap);
+
+      refreshRemoveButtons();
+      return wrap;
+    }
+
+    function removePartRow(idx) {
+      partRows.splice(idx, 1);
+      renderAllPartRows();
+    }
+
+    function renderAllPartRows() {
+      const container = $('#srvPartsContainer');
+      if (!container) return;
+      const saved = partRows.slice(); // záloha
+      partRows = [];
+      container.innerHTML = '';
+      saved.forEach(r => createPartRow(r));
+      refreshRemoveButtons();
+    }
+
+    function refreshRemoveButtons() {
+      const container = $('#srvPartsContainer');
+      if (!container) return;
+      const rows = container.querySelectorAll('[data-part-idx]');
+      rows.forEach((row, i) => {
+        const btn = row.querySelector('button');
+        if (btn) btn.style.visibility = rows.length <= 1 ? 'hidden' : 'visible';
+      });
+    }
+
+    function resetPartRows() {
+      partRows = [];
+      const container = $('#srvPartsContainer');
+      if (container) container.innerHTML = '';
+      createPartRow({});   // vždy jeden prázdný řádek
+      // Aktualizuj "Přidat díl" tlačítko text dle jazyka
+      const addBtn = $('#srvAddPart');
+      if (addBtn) addBtn.textContent = LANG==='cs' ? '+ Přidat díl' : '+ Add part';
+    }
+
+    // Získej pole dílů z formuláře (pro uložení do záznamu)
+    function getPartsList() {
+      return partRows
+        .filter(r => (Array.isArray(r.parts) && r.parts.some(p => p.partNo||p.partName)) || r.partNo || r.partName)
+        .map(r => ({ catalogIdx: r.catalogIdx, partNo: r.partNo.trim(), partName: r.partName.trim() }));
+    }
+
+    // Načti díly ze záznamu do formuláře (pro editaci)
+    function loadPartsFromRecord(r) {
+      partRows = [];
+      const container = $('#srvPartsContainer');
+      if (container) container.innerHTML = '';
+      // Starý formát: r.partNo / r.partName (jeden díl)
+      // Nový formát: r.parts (pole objektů { partNo, partName })
+      let list = [];
+      if (Array.isArray(r.parts) && r.parts.length > 0 && typeof r.parts[0] === 'object' && 'partNo' in r.parts[0]) {
+        list = r.parts;
+      } else if (r.partNo || r.partName) {
+        list = [{ partNo: r.partNo || '', partName: r.partName || '', catalogIdx: -1 }];
+      }
+      if (list.length === 0) list = [{}];
+      list.forEach(p => createPartRow(p));
     }
 
     async function renderPickedPreviews() {
@@ -1344,11 +1478,11 @@
       $('#srvType').value='Jiné';
       $('#srvFolder').value='';
       $('#srvTitle').value = ''; $('#srvTicket').value='';
-      $('#srvTicketLink').value=''; $('#srvPartNo').value=''; $('#srvPartName').value='';
+      $('#srvTicketLink').value='';
       $('#srvDesc').value='';
       selectedTechs = []; renderTechList(); updateTechDisplay();
-      $('#srvPartSelect').value='-1';
       rebuildSerials();
+      resetPartRows();
       const extTechEl = document.getElementById('srvExtTech');
       if (extTechEl) extTechEl.value = '';
       editIndex = -1; srvStatus = 'none'; $('#srvMarkOut').classList.remove('primary'); $('#srvMarkBack').classList.remove('primary');
@@ -1376,24 +1510,30 @@
         title: $('#srvTitle').value.trim(),
         ticket: $('#srvTicket').value.trim(),
         ticketLink: ($('#srvTicketLink')||{value:''}).value.trim(),
-        partNo: $('#srvPartNo').value.trim(),
-        partName: $('#srvPartName').value.trim(),
+        parts: getPartsList(),  // pole { catalogIdx, partNo, partName }
         desc: $('#srvDesc').value.trim(),
         back: backVal,
         tech: [...selectedTechs],
         extTech: ($('#srvExtTech')||{value:''}).value.trim()
       };
 
-      // Odpočet dílu ze skladu (jen jednou, i pro více robotů)
-      const selIdx = Number($('#srvPartSelect').value);
-      if (Number.isFinite(selIdx) && selIdx >= 0 && selIdx < dily.length) {
-        if ((dily[selIdx].qty||0) > 0) {
-          dily[selIdx].qty = (dily[selIdx].qty||0) - 1;
-          dily[selIdx].updatedDate = (new Date()).toISOString().slice(0,10);
-          await persistParts();
-        } else {
-          alert(t('alert_no_stock'));
+      // Odpočet dílů ze skladu – všechny řádky, jednou bez ohledu na počet serialů
+      const partsList = getPartsList();
+      let anyStockIssue = false;
+      for (const p of partsList) {
+        const idx = p.catalogIdx;
+        if (Number.isFinite(idx) && idx >= 0 && idx < dily.length) {
+          if ((dily[idx].qty || 0) > 0) {
+            dily[idx].qty = (dily[idx].qty || 0) - 1;
+            dily[idx].updatedDate = (new Date()).toISOString().slice(0, 10);
+          } else {
+            anyStockIssue = true;
+          }
         }
+      }
+      if (anyStockIssue) alert(t('alert_no_stock'));
+      if (partsList.some(p => Number.isFinite(p.catalogIdx) && p.catalogIdx >= 0)) {
+        await persistParts();
       }
 
       // Kopírujeme soubory/fotky jen jednou (nebo pro každý serial – dle preferencí)
@@ -1484,12 +1624,12 @@
       if (r.serial) { selectedSerials = [r.serial]; renderSerialList(''); updateSerialDisplay(); }
       $('#srvDate').value = r.date || ''; $('#srvTime').value = r.time || '';
       $('#srvTitle').value = r.title || ''; $('#srvTicket').value = r.ticket || ''; $('#srvTicketLink').value = r.ticketLink || ''; if($('#srvExtTech')) $('#srvExtTech').value = r.extTech || '';
-      $('#srvPartNo').value = r.partNo || ''; $('#srvPartName').value = r.partName || '';
+      loadPartsFromRecord(r);
       $('#srvDesc').value = r.desc || '';
       // Načti techniky do multi-select
       selectedTechs = Array.isArray(r.tech) ? [...r.tech] : (r.tech ? String(r.tech).split(',').map(s=>s.trim()).filter(Boolean) : []);
       renderTechList(); updateTechDisplay();
-      $('#srvFolder').value = r.id || ''; $('#srvPartSelect').value = '-1';
+      $('#srvFolder').value = r.id || '';
       srvStatus = (r.back===true)?'back':(r.back===false?'out':'none');
       $('#srvMarkBack').classList.toggle('primary', srvStatus==='back');
       $('#srvMarkOut').classList.toggle('primary', srvStatus==='out');
@@ -1644,7 +1784,19 @@ function renderServisList() {
           <div class="divider"></div>
           <div class="grid">
             <div class="ticket-row" style="display:flex;gap:8px;align-items:center;"><b>Ticket:</b> <span>${r.ticket || '<span class="soft">—</span>'}</span>${r.ticketLink ? `<a class="ticket-link-icon" href="${r.ticketLink}" target="_blank" rel="noopener noreferrer" title="Otevřít Geek ticket" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;border:1px solid var(--border);background:var(--btn-bg);color:var(--accent);text-decoration:none;flex-shrink:0;"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg></a>` : ''}</div>
-            <div><b>Díl:</b> ${r.partNo ? r.partNo + ' – ' + (r.partName||'') : '<span class="soft">—</span>'}</div>
+            <div><b>${LANG==='cs'?'Díly':'Parts'}:</b> ${
+            (() => {
+              // Nový formát: r.parts = [{ partNo, partName }, ...]
+              if (Array.isArray(r.parts) && r.parts.length > 0 && typeof r.parts[0] === 'object' && 'partNo' in r.parts[0]) {
+                const filled = r.parts.filter(p => p.partNo || p.partName);
+                return filled.length > 0
+                  ? filled.map(p => `<span class="chip">${p.partNo ? p.partNo + (p.partName ? ' – ' + p.partName : '') : p.partName}</span>`).join(' ')
+                  : '<span class="soft">—</span>';
+              }
+              // Starý formát
+              return r.partNo ? `<span class="chip">${r.partNo}${r.partName ? ' – ' + r.partName : ''}</span>` : '<span class="soft">—</span>';
+            })()
+          }</div>
             <div><b>Technik:</b> ${(() => { const a = Array.isArray(r.tech) ? r.tech : (r.tech ? [r.tech] : []); const ext = r.extTech ? ['<em>'+r.extTech+'</em>'] : []; const all = [...a, ...ext].filter(Boolean); return all.length ? all.join(', ') : '<span class="soft">—</span>'; })()}</div>
             <div class="soft">Složka: ${r.id}</div>
           </div>
@@ -2055,6 +2207,10 @@ function renderMaintenance() {
 
     function formatUsedParts(r){
       if (!r.partsUsed || !r.partsUsed.length) {
+        if (Array.isArray(r.parts) && r.parts.length > 0 && typeof r.parts[0] === 'object' && 'partNo' in r.parts[0]) {
+          const filled = r.parts.filter(p => p.partNo || p.partName);
+          if (filled.length > 0) return filled.map(p => `${p.partNo||''}${p.partName ? ' - '+p.partName : ''}`).join('; ');
+        }
         if (r.partNo || r.partName) {
           return `${r.partNo||''}${r.partName ? ' - ' + r.partName : ''}`;
         }
@@ -2236,7 +2392,7 @@ th { background:#f1f5f9; text-align:left; }
           $('#secHome').classList.remove('hidden');
           servis = await ensureJSON('servisni.json');
           dily = await ensureJSON('dily.json');
-          populateTechFilter(); renderServisList(); renderParts(); populatePartSelect(); renderMaintenance(); refreshKPIs();
+          populateTechFilter(); renderServisList(); renderParts(); populatePartSelect(); resetPartRows(); renderMaintenance(); refreshKPIs();
           const n = niceNow();
           $('#srvDate').value = n.date; $('#srvTime').value = n.time;
           $('#srvType').value = 'Jiné'; rebuildSerials(); resetFormOnlyPhotos();
@@ -2270,7 +2426,7 @@ th { background:#f1f5f9; text-align:left; }
           $('#secHome').classList.remove('hidden');
           servis = await ensureJSON('servisni.json');
           dily = await ensureJSON('dily.json');
-          populateTechFilter(); renderServisList(); renderParts(); populatePartSelect(); renderMaintenance(); refreshKPIs();
+          populateTechFilter(); renderServisList(); renderParts(); populatePartSelect(); resetPartRows(); renderMaintenance(); refreshKPIs();
           const n = niceNow(); $('#srvDate').value = n.date; $('#srvTime').value = n.time; $('#srvType').value = 'Jiné'; rebuildSerials(); resetFormOnlyPhotos();
           goto('secHome');
         } catch(err) { console.error(err); alert(t('alert_folder_pick_fail')); }
@@ -2357,11 +2513,10 @@ th { background:#f1f5f9; text-align:left; }
       });
       $('#srvSave').addEventListener('click', saveServisRecord);
       $('#srvCancelEdit').addEventListener('click', cancelEdit);
-      $('#addPart').addEventListener('click', onAddPart);
-      $('#srvPartSelect').addEventListener('change', () => {
-        const idx = Number($('#srvPartSelect').value);
-        if (!Number.isFinite(idx) || idx < 0 || idx >= dily.length) { $('#srvPartNo').value = ''; $('#srvPartName').value = ''; return; }
-        const p = dily[idx]; $('#srvPartNo').value = p.number || ''; $('#srvPartName').value = p.name || '';
+      // Tlačítko přidat díl
+      const srvAddPartBtn = $('#srvAddPart');
+      if (srvAddPartBtn) srvAddPartBtn.addEventListener('click', () => {
+        createPartRow({});
       });
       $('#exportCSV').addEventListener('click', exportCSV);
       $('#exportPrint').addEventListener('click', ()=> { document.querySelectorAll('#srvList .hidden').forEach(el => el.classList.add('print-open')); document.querySelectorAll('#srvList .print-open').forEach(el => el.classList.remove('hidden')); setTimeout(()=> window.print(), 50); });
