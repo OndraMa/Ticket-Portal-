@@ -1163,10 +1163,12 @@
         item.onmouseenter = () => item.style.background = 'var(--hover-bg,rgba(255,255,255,.06))';
         item.onmouseleave = () => item.style.background = '';
         const cb = document.createElement('input');
-        cb.type = 'checkbox'; cb.value = s; cb.checked = checked;
+        cb.type = editIndex !== -1 ? 'radio' : 'checkbox';
+        cb.name = 'srvSerial'; cb.value = s; cb.checked = checked;
         cb.style.cssText = 'width:15px;height:15px;accent-color:var(--accent,#3b82f6);cursor:pointer;';
         cb.addEventListener('change', () => {
-          if (cb.checked) { if (!selectedSerials.includes(s)) selectedSerials.push(s); }
+          if (editIndex !== -1) { selectedSerials = cb.checked ? [s] : []; }
+          else if (cb.checked) { if (!selectedSerials.includes(s)) selectedSerials.push(s); }
           else { selectedSerials = selectedSerials.filter(x => x !== s); }
           updateSerialDisplay();
           updateStatusButtons();
@@ -1240,6 +1242,8 @@
     function rebuildSerials() {
       const type = $('#srvType').value;
       const toggle = $('#srvSerialToggle');
+      const selectAll = $('#srvSerialSelAll');
+      if (selectAll) selectAll.hidden = editIndex !== -1;
       selectedSerials = [];
       if (type === 'RS11' || type === 'P40') {
         if (toggle) toggle.disabled = false;
@@ -1556,6 +1560,7 @@
       const type=$('#srvType').value;
       if(!type){missing.push(LANG==='cs'?'Typ robota':'Robot type');$('#srvType').parentElement.classList.add('field-error');}
       if((type==='RS11'||type==='P40')&&!selectedSerials.length){missing.push(LANG==='cs'?'Sériové číslo (vyberte alespoň jedno)':'Serial number (select at least one)');$('#srvSerialWrap').classList.add('field-error');}
+      if((type==='RS11'||type==='P40')&&editIndex!==-1&&selectedSerials.length>1){missing.push(LANG==='cs'?'Při úpravě vyberte právě jedno sériové číslo':'Select exactly one serial number when editing');$('#srvSerialWrap').classList.add('field-error');}
       if(!$('#srvDate').value){missing.push(LANG==='cs'?'Datum':'Date');$('#srvDate').parentElement.classList.add('field-error');}
       if(!$('#srvTime').value){missing.push(LANG==='cs'?'Čas':'Time');$('#srvTime').parentElement.classList.add('field-error');}
       if(!$('#srvTitle').value.trim()){missing.push(LANG==='cs'?'Nadpis úkonu':'Task title');$('#srvTitle').parentElement.classList.add('field-error');}
@@ -1575,11 +1580,12 @@
       $('#srvTicketLink').value='';
       $('#srvDesc').value='';
       selectedTechs = []; renderTechList(); updateTechDisplay();
+      editIndex = -1;
       rebuildSerials();
       resetPartRows();
       const extTechEl = document.getElementById('srvExtTech');
       if (extTechEl) extTechEl.value = '';
-      editIndex = -1; srvStatus = 'none'; $('#srvMarkOut').classList.remove('primary'); $('#srvMarkBack').classList.remove('primary');
+      srvStatus = 'none'; $('#srvMarkOut').classList.remove('primary'); $('#srvMarkBack').classList.remove('primary');
       $('#srvSave').textContent = t('form_save'); $('#srvCancelEdit').classList.add('hidden');
       updateStatusButtons();
     }
@@ -1590,9 +1596,7 @@
 
       const type = $('#srvType').value;
       // Při editaci = jeden serial, při novém záznamu = selectedSerials (může být více)
-      const serialList = editIndex !== -1
-        ? [servis[editIndex].serial || '']
-        : ((type==='RS11'||type==='P40') ? [...selectedSerials] : ['']);
+      const serialList = (type==='RS11'||type==='P40') ? [...selectedSerials] : [''];
 
       const date = $('#srvDate').value;
       const time = $('#srvTime').value;
@@ -2552,6 +2556,7 @@ th { background:#f1f5f9; text-align:left; }
       const selNone = $('#srvSerialSelNone');
       if (selAll) selAll.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (editIndex !== -1) return;
         const type = $('#srvType').value;
         selectedSerials = type==='RS11' ? [...RS11] : type==='P40' ? [...P40] : [];
         renderSerialList($('#srvSerialSearch').value||'');
