@@ -27,11 +27,25 @@ function fixture({ type = 'RS11', selected = ['NEW'], editing = true } = {}) {
     srvTicketLink: original.ticketLink, srvExtTech: '', srvFolder: original.id
   }).forEach(([key, value]) => { $(`#${key}`).value = value; });
   const writes = [], alerts = [], folders = [];
+  let sequence = 0;
+  const disk = new Map([[original.id, new Map([['photo.jpg', 'photo bytes'], ['report.pdf', 'report bytes']])]]);
+  const dataDir = { async getDirectoryHandle(folder) {
+    folders.push(folder);
+    if (!disk.has(folder)) disk.set(folder, new Map());
+    const files = disk.get(folder);
+    return { async getFileHandle(name, options = {}) {
+      if (!options.create && !files.has(name)) throw new Error('Missing attachment');
+      return {
+        async getFile() { return { name, async arrayBuffer() { return files.get(name); } }; },
+        async createWritable() { return { async write(bytes) { files.set(name, bytes); }, async close() {} }; }
+      };
+    } };
+  } };
   const context = vm.createContext({ $, document: { getElementById: id => $(`#${id}`), createElement: element },
     LANG: 'cs', editIndex: editing ? 0 : -1, selectedSerials: selected, selectedTechs: ['Technician'],
     RS11: ['OLD', 'NEW'], P40: ['P40-NEW'], servis: [structuredClone(original)], dily: [],
     srvStatus: 'out', photoHandles: [], fileHandles: [],
-    dataDir: { async getDirectoryHandle(folder) { folders.push(folder); return {}; } },
+    dataDir, crypto: { randomUUID: () => `unique-${++sequence}` },
     getPartsList: () => structuredClone(original.parts),
     async writeJSON(name, value) { writes.push({ name, value: JSON.parse(JSON.stringify(value)) }); },
     async persistParts() { throw new Error('Unexpected stock write'); },
@@ -42,7 +56,7 @@ function fixture({ type = 'RS11', selected = ['NEW'], editing = true } = {}) {
   vm.runInContext(source('validateServisForm', 'resetFormOnlyPhotos') +
     source('saveServisRecord', 'startEdit') + source('renderSerialList', 'getTechNames').split('// === MULTI-SELECT TECHNIK ===')[0] +
     source('rebuildSerials', 'populatePartSelect'), context);
-  return { context, original, writes, alerts, folders, $ };
+  return { context, original, writes, alerts, folders, disk, $ };
 }
 for (const type of ['RS11', 'P40']) test(`edit persists the selected ${type} serial and preserves the record`, async () => {
   const f = fixture({ type, selected: [`${type}-NEW`] });
@@ -56,7 +70,7 @@ test('changing to a type without serial clears the old serial', async () => {
   await f.context.saveServisRecord();
   assert.equal(f.writes[0].value[0].serial, '');
 });
-for (const selected of [[], ['OLD', 'NEW']]) test(`invalid edit selection ${JSON.stringify(selected)} does not write`, async () => {
+for (const selected of [[]]) test(`invalid edit selection ${JSON.stringify(selected)} does not write`, async () => {
   const f = fixture({ selected });
   await f.context.saveServisRecord();
   assert.equal(f.writes.length, 0);
@@ -69,19 +83,42 @@ test('new records still support multiple robots', async () => {
   assert.deepEqual(f.writes[0].value.slice(0, 2).map(r => r.serial).sort(), ['NEW', 'OLD']);
   assert.deepEqual(f.writes[0].value[2], f.original);
 });
-test('edit serial selection replaces the old robot and hides select all', () => {
-  const f = fixture({ selected: ['OLD'] });
+for (const editing of [true, false]) test(`checkboxes support multiple selections (editing=${editing})`, () => {
+  const f = fixture({ editing, selected: ['OLD'] });
   f.context.renderSerialList('');
-  const input = f.$('#srvSerialList').children[1].children[0];
-  assert.equal(input.type, 'radio');
-  input.checked = true; input.change();
+  const inputs = f.$('#srvSerialList').children.map(item => item.children[0]);
+  assert.equal(inputs[1].type, 'checkbox');
+  inputs[1].checked = true; inputs[1].change();
+  assert.deepEqual(Array.from(f.context.selectedSerials), ['OLD', 'NEW']);
+  inputs[0].checked = false; inputs[0].change();
   assert.deepEqual(Array.from(f.context.selectedSerials), ['NEW']);
-  f.context.rebuildSerials();
-  assert.equal(f.$('#srvSerialSelAll').hidden, true);
-  f.context.editIndex = -1;
-  f.context.rebuildSerials();
-  assert.equal(f.$('#srvSerialSelAll').hidden, false);
-  assert.equal(f.$('#srvSerialList').children.at(-1).children[0].type, 'checkbox');
+});
+for (const selected of [['NEW', 'SECOND'], ['OLD', 'NEW']]) test(`edit saves every selected robot: ${selected}`, async () => {
+  const f = fixture({ selected });
+  const unrelated = { ...f.original, id: 'unrelated', serial: 'OTHER' };
+  f.context.servis.push(unrelated);
+  f.context.fileHandles = [{ async getFile() { return { name: 'new.txt', async arrayBuffer() { return 'new bytes'; } }; } }];
+  await f.context.saveServisRecord();
+  const records = f.writes[0].value;
+  assert.equal(records.length, 3);
+  assert.deepEqual(records.slice(0, 2).map(r => r.serial), selected);
+  assert.equal(records[0].id, f.original.id);
+  assert.notEqual(records[1].id, records[0].id);
+  assert.deepEqual(records[2], unrelated);
+  for (const record of records.slice(0, 2)) {
+    assert.deepEqual(record, { ...f.original, serial: record.serial, id: record.id, files: ['report.pdf', 'new.txt'] });
+    assert.deepEqual([...f.disk.get(record.id)], [['photo.jpg', 'photo bytes'], ['report.pdf', 'report bytes'], ['new.txt', 'new bytes']]);
+  }
+  // Deleting the first record's folder cannot remove the second record's attachments.
+  f.disk.delete(records[0].id);
+  assert.equal(f.disk.get(records[1].id).get('photo.jpg'), 'photo bytes');
+});
+test('attachment copy failure does not replace the record or write the history', async () => {
+  const f = fixture({ selected: ['NEW', 'SECOND'] });
+  f.disk.get(f.original.id).delete('photo.jpg');
+  await assert.rejects(() => f.context.saveServisRecord(), /Missing attachment/);
+  assert.equal(f.writes.length, 0);
+  assert.deepEqual(f.context.servis, [f.original]);
 });
 test('all inline scripts parse', () => {
   for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) new vm.Script(match[1]);
