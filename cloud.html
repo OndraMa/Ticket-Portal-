@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geek+ by LT/VFX – Evidence robotů (OneDrive)</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2360a5fa'/><text y='24' x='4' font-size='22' font-weight='700' fill='%23fff'>G+</text></svg>" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <script src="cloud/config.js"></script>
+  <script src="cloud/adapter.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg:#0f1216; --card:#151a21; --muted:#9aa3af; --text:#e5e7eb; --accent:#60a5fa;
+      --accent-text:#0b1020; --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --border:#252b36;
+      --field-bg:#0e141c; --chip-bg:#141c27; --btn-bg:#1e2631; --btn-text:#e5e7eb;
+      --btn-border:#252b36; --btn-hover-border:#3a4452; --danger-bg:#2a1517; --danger-border:#52252a; --danger-text:#fecaca;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); transition: background .2s ease, color .2s ease; }
+    h1,h2,h3 { margin: 16px 0 8px; text-align:center; }
+    h1 { font-size: 1.8rem; cursor:pointer; text-align:center; justify-self:center; }
+    h1:hover { text-decoration: underline; }
+    h2 { font-size: 1.25rem; color: var(--muted); }
+    .wrap { max-width: 1150px; margin: 0 auto; padding: 16px; }
+    .top { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:8px 16px; }
+    .soft { color: var(--muted); }
+    .hidden { display:none !important; }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .col { display:flex; flex-direction:column; gap:8px; }
+    .nav { display:flex; gap:8px; flex-wrap: wrap; justify-content:center; margin: 12px 0 16px; }
+    .nav .active { background: var(--accent); color: var(--accent-text); border-color: transparent; box-shadow: 0 2px 10px rgba(37,99,235,.18); }
+    body[data-theme="light"] .nav .active { color:#ffffff; }
+    button, .btn {
+      background:var(--btn-bg); color:var(--btn-text); border:1px solid var(--btn-border);
+      padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    }
+    button:hover { border-color:var(--btn-hover-border); }
+    .primary { background: var(--accent); color:var(--accent-text); border-color: transparent; }
+    .primary:hover { filter: brightness(1.05); }
+    .danger { background: var(--danger-bg); border-color:var(--danger-border); color:var(--danger-text); }
+    input, select, textarea {
+      background:var(--field-bg); color:var(--text); border:1px solid var(--border);
+      padding:9px 12px; border-radius:12px; width:100%;
+    }
+    .input-icon-wrap { position:relative; }
+    .input-icon-wrap input { padding-right:40px; }
+    .input-icon {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      width:18px; height:18px; color:var(--muted); pointer-events:none; opacity:.9;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      position:absolute; right:10px; width:22px; height:22px; opacity:0; cursor:pointer;
+    }
+    input[type="date"], input[type="time"] { min-height:42px; }
+    label { font-weight:700; margin-bottom:6px; display:block; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px; }
+    .grid { display:grid; gap:12px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    .muted { color: var(--muted); }
+    .tag { display:inline-block; padding:2px 8px; border-radius:999px; background:#1b2330; border:1px solid var(--border); font-size:12px; }
+    .kpi { display:flex; gap:8px; align-items:baseline; justify-content:center; }
+    .kpi b { font-size: 1.4rem; }
+    .section-title { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .thumbs { display:flex; flex-wrap:wrap; gap:8px; }
+    .thumbs img { width: 120px; height: 90px; object-fit:cover; border-radius:10px; border:1px solid var(--border); cursor:pointer; }
+    .thumb-wrap { position:relative; display:inline-block; }
+    .thumb-wrap .thumb-remove { position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:var(--danger,#e05252); color:#fff; border:none; cursor:pointer; font-size:13px; line-height:20px; text-align:center; padding:0; display:flex; align-items:center; justify-content:center; opacity:0.9; }
+    .thumb-wrap .thumb-remove:hover { opacity:1; transform:scale(1.1); }
+    .file-chip { display:inline-flex; align-items:center; gap:6px; background:var(--chip-bg,#1b2330); border:1px solid var(--border); border-radius:999px; padding:3px 10px 3px 12px; font-size:13px; max-width:260px; }
+    .file-chip span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .file-chip button { background:none; border:none; cursor:pointer; color:var(--muted); font-size:15px; line-height:1; padding:0; margin-left:2px; }
+    .file-chip button:hover { color:var(--danger,#e05252); }
+    #srvFileList { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+    .hist-item { border:1px solid var(--border); background:#11161f; border-radius:14px; padding:12px; }
+    .hist-head { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; }
+    .hist-title { font-weight:800; }
+    .hist-meta { display:flex; gap:8px; flex-wrap:wrap; }
+    .divider { height:1px; background:var(--border); margin:8px 0; }
+    .center { text-align:center; }
+    .table { width:100%; border-collapse: collapse; }
+    .table th, .table td { border-bottom:1px solid var(--border); padding:8px; text-align:left; }
+    .table th { color: var(--muted); font-weight:700; }
+    .sort-head{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none;}
+    .sort-head .arr{font-size:12px;color:var(--muted);opacity:.85;}
+    .sort-head.active{color:var(--accent);}
+    .sort-head.active .arr{color:var(--accent);opacity:1;}
+    .days-badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px;font-weight:700;}
+    .days-good{background:#16351f;border-color:#28553a;color:#bbf7d0;}
+    .days-warn{background:#4a2f12;border-color:#7c4a16;color:#fde68a;}
+    .days-bad{background:#3a161a;border-color:#6b222a;color:#fecaca;}
+    .right { text-align:right; }
+    .pill { border-radius: 999px; padding: 2px 8px; background:var(--chip-bg); border:1px solid var(--border); }
+    .home-grid .card { text-align:center; padding:24px; }
+    .home-big { font-size: 1.1rem; }
+    @media print {
+      .nav, #pickData, #pickedInfo, .no-print, .top .row { display:none !important; }
+      body { background: white; color:black; }
+      .card { border: none; }
+    }
+    body[data-theme="light"] {
+      --bg:#eef2f7; --card:#ffffff; --muted:#64748b; --text:#0f172a; --accent:#2563eb;
+      --ok:#15803d; --warn:#b45309; --danger:#dc2626; --border:#cbd5e1;
+      --field-bg:#ffffff; --chip-bg:#f1f5f9; --btn-bg:#ffffff; --btn-text:#0f172a;
+      --btn-border:#cbd5e1; --btn-hover-border:#94a3b8; --danger-bg:#fee2e2; --danger-border:#fecaca; --danger-text:#991b1b;
+    }
+    body[data-theme="light"] h1,
+    body[data-theme="light"] h2,
+    body[data-theme="light"] h3,
+    body[data-theme="light"] label,
+    body[data-theme="light"] .hist-title,
+    body[data-theme="light"] .home-big,
+    body[data-theme="light"] .table td,
+    body[data-theme="light"] .table th,
+    body[data-theme="light"] .section-title,
+    body[data-theme="light"] .kpi b,
+    body[data-theme="light"] .pill,
+    body[data-theme="light"] .tag,
+    body[data-theme="light"] .soft,
+    body[data-theme="light"] .muted {
+      color: var(--text);
+    }
+    body[data-theme="light"] .soft,
+    body[data-theme="light"] .muted,
+    body[data-theme="light"] .table th,
+    body[data-theme="light"] .hist-date,
+    body[data-theme="light"] .kpi .muted,
+    body[data-theme="light"] #pickedInfo {
+      color: #64748b;
+    }
+    body[data-theme="light"] .hist-item {
+      background:#ffffff;
+      border:1px solid var(--border);
+      box-shadow: 0 1px 2px rgba(15,23,42,.04);
+    }
+    body[data-theme="light"] .tag,
+    body[data-theme="light"] .pill {
+      background:#f8fafc;
+      border-color:#cbd5e1;
+      color:#0f172a;
+    }
+    body[data-theme="light"] .status-out,
+    body[data-theme="light"] .tag.status-out {
+      background:#fff1f2;
+      color:#9f1239;
+      border-color:#fecdd3;
+    }
+    body[data-theme="light"] .status-back,
+    body[data-theme="light"] .tag.status-back {
+      background:#ecfdf5;
+      color:#166534;
+      border-color:#bbf7d0;
+    }
+    body[data-theme="light"] .divider {
+      background:#e2e8f0;
+    }
+    body[data-theme="light"] input::placeholder,
+    body[data-theme="light"] textarea::placeholder {
+      color:#94a3b8;
+    }
+  
+    .req-star{color:#dc4646 !important;font-size:.9em;margin-left:3px;vertical-align:middle;font-weight:700;}
+    .field-error input,.field-error select,.field-error textarea{border-color:var(--danger)!important;box-shadow:0 0 0 2px rgba(220,60,60,.18);}
+    .field-error /* label danger removed */
+    #statsChartWrap canvas{max-height:260px;width:100%!important;}
+    .reliability-table th,.reliability-table td{padding:8px 12px;}
+    .reliability-table th{background:var(--card);color:var(--muted);font-size:.8em;text-transform:uppercase;}
+    .reliability-table tr:hover td{background:var(--chip-bg);}
+    .badge-ok{background:#0e321c;color:#22a052;border:1px solid #22a052;border-radius:20px;padding:2px 10px;font-size:.78em;}
+    .badge-mid{background:#372606;color:#d29620;border:1px solid #d29620;border-radius:20px;padding:2px 10px;font-size:.78em;}
+    .badge-low{background:#370a0a;color:#dc4646;border:1px solid #dc4646;border-radius:20px;padding:2px 10px;font-size:.78em;}
+    .parts-tab-bar{display:flex;gap:10px;margin-bottom:14px;}
+    .parts-tab-bar .btn.tab-active{background:var(--accent);color:#fff;}
+    .stats-period-btn.active-period{background:var(--accent);color:#fff;}
+    .pill-type{display:inline-block;border-radius:20px;padding:2px 10px;font-size:.78em;font-weight:600;}
+    .pill-rs11{background:#142d50;color:#4f95e9;border:1px solid #4f95e9;}
+    .pill-p40{background:#0e321c;color:#22a052;border:1px solid #22a052;}
+    .pill-other{background:#372606;color:#d29620;border:1px solid #d29620;}
+    .parts-filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+    .parts-filter-bar input{flex:1;min-width:180px;}
+    .pf-btn{cursor:pointer;border:1px solid var(--border);border-radius:20px;padding:3px 14px;font-size:.8em;background:var(--chip-bg);color:var(--muted);user-select:none;}
+    .pf-btn.pf-active{border-color:var(--accent);color:var(--accent);background:rgba(79,149,233,.12);}
+    .qty-low{color:var(--danger)!important;font-weight:700;}
+    .qty-warn{color:#d29620!important;font-weight:700;}
+    .qty-ok{color:#22a052;}
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div></div><h1 id="homeLink" title="Zpět na hlavní obrazovku">Geek+ by LT/VFX – Evidence robotů</h1>
+      <div class="row">
+        <button id="pickData" class="primary hidden">Odhlásit</button>
+        <span id="pickedInfo" class="soft">Cloud • nepřihlášen</span>
+        <button id="themeToggle" title="Přepnout motiv" class="btn" style="padding:6px 10px;">🌙</button>
+        <select id="langSelect" title="Language" class="btn" style="padding:6px 10px;">
+          <option value="cs">Čeština</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+
+    <nav class="nav hidden" id="topNav">
+      <button data-goto="secHome" class="btn">Domů</button>
+      <button data-goto="secServisHome" class="btn">Servis</button>
+      <button data-goto="secUdrzba" class="btn">Údržba</button>
+      <button data-goto="secStats" class="btn">Statistiky</button>
+      <button data-goto="secParts" class="btn">Náhradní díly</button>
+      <button data-goto="secExport" class="btn">Export</button>
+    </nav>
+
+    <section id="secGate">
+      <div class="card center">
+        <h2>Vítej v „Geek+ by LT/VFX – Evidence robotů“</h2>
+        <p class="soft">Zadej společné heslo portálu. Záznamy a přílohy se načtou z OneDrivu.</p>
+        <div class="row" style="justify-content:center; margin-top:12px;">
+          <form id="cloudLogin"><label for="cloudPassword">Heslo portálu</label><input id="cloudPassword" type="password" required autocomplete="current-password" maxlength="256"><button id="gatePick" type="submit" class="primary" style="margin-top:12px">Přihlásit</button><p id="cloudError" role="alert"></p></form>
+        </div>
+      </div>
+    </section>
+
+    <section id="secHome" class="home-grid grid grid-3 hidden">
+      <div class="card">
+        <div class="home-big">Servis</div>
+        <div class="soft" style="margin:6px 0 12px;">záznamy, historie, fotky</div>
+        <div class="row" style="justify-content:center;">
+          <button class="btn" data-goto="secServisHome">Otevřít</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="home-big">Údržba</div>
+        <div class="soft" style="margin:6px 0 12px;">stav robotů mimo provoz</div>
+        <div class="row" style="justify-content:center;">
+          <button class="btn" data-goto="secUdrzba">Otevřít</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="home-big">Náhradní díly</div>
+        <div class="soft" style="margin:6px 0 12px;">katalog a zásoby</div>
+        <div class="row" style="justify-content:center;">
+          <button class="btn" data-goto="secParts">Otevřít</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="secServisHome" class="hidden">
+      <div class="card center">
+        <h2>Servis</h2>
+        <div class="row" style="justify-content:center; margin-top:12px;">
+          <button class="btn" data-goto="secServisForm">ZAPSAT ZÁZNAM</button>
+          <button class="btn" data-goto="secServisHist">HISTORIE</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="secServisForm" class="hidden">
+      <div class="card">
+        <div class="section-title"><h2>Nový servisní záznam</h2><span class="muted">automatická složka + kopie fotek</span></div>
+        <div class="grid grid-2">
+          <!-- ŘÁDEK 1: Typ robota | Sériové číslo -->
+          <div>
+            <label data-i18n="form_type">Typ robota <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+            <select id="srvType">
+              <option value="Jiné">Jiné/Ostatní</option>
+              <option value="RS11">RS11</option>
+              <option value="P40">P40</option>
+            </select>
+          </div>
+          <div id="srvSerialWrap">
+            <label id="srvSerialLabel" data-i18n="form_serial">Sériové číslo</label>
+            <!-- Multi-select custom dropdown -->
+            <div id="srvSerialMultiWrap" style="position:relative;">
+              <button type="button" id="srvSerialToggle" class="btn" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:400;background:var(--input-bg,var(--card));border:1px solid var(--border);border-radius:10px;" disabled>
+                <span id="srvSerialDisplay">— N/A —</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="srvSerialDropdown" class="hidden" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 4px;max-height:220px;overflow-y:auto;box-shadow:0 4px 24px #0006;">
+                <div style="padding:4px 8px 6px;">
+                  <input id="srvSerialSearch" type="text" placeholder="Hledat..." style="width:100%;padding:5px 8px;border-radius:7px;border:1px solid var(--border);background:var(--input-bg,var(--surface));font-size:13px;" />
+                </div>
+                <div id="srvSerialList"></div>
+                <div style="padding:6px 8px 2px;border-top:1px solid var(--border);margin-top:4px;display:flex;gap:8px;">
+                  <button type="button" id="srvSerialSelAll" class="btn" style="font-size:12px;padding:3px 10px;">Vše</button>
+                  <button type="button" id="srvSerialSelNone" class="btn" style="font-size:12px;padding:3px 10px;">Žádné</button>
+                </div>
+              </div>
+            </div>
+            <!-- Skrytý hidden input neslouží, stav drží JS pole selectedSerials -->
+          </div>
+
+          <!-- ŘÁDEK 2: Datum | Čas -->
+          <div>
+            <label><span data-i18n="form_date">Datum</span> <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+            <div class="input-icon-wrap">
+              <input id="srvDate" type="date" />
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+          </div>
+          <div>
+            <label><span data-i18n="form_time">Čas</span> <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+            <div class="input-icon-wrap">
+              <input id="srvTime" type="time" />
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 15"></polyline></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- ŘÁDEK 3: Nadpis úkonu – celý řádek -->
+        <div style="margin-top:12px;">
+          <label data-i18n="form_headline">Nadpis úkonu <span style="color:#e53935!important;font-size:.9em;margin-left:3px;font-weight:900;vertical-align:middle;">✱</span></label>
+          <input id="srvTitle" type="text" placeholder="" />
+        </div>
+
+        <!-- ŘÁDEK 4: Geek ticket | Geek ticket link -->
+        <div class="grid grid-2" style="margin-top:12px;">
+          <div>
+            <label data-i18n="form_ticket">Geek ticket</label>
+            <input id="srvTicket" type="text" />
+          </div>
+          <div>
+            <label data-i18n="form_ticket_link">Geek ticket link</label>
+            <input id="srvTicketLink" type="url" placeholder="https://..." />
+          </div>
+        </div>
+
+        <!-- ŘÁDEK 5: Díly – dynamický seznam -->
+        <div id="srvPartsContainer" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
+        <button type="button" id="srvAddPart" class="btn" style="margin-top:6px;width:fit-content;font-size:13px;padding:5px 14px;">+ Přidat díl</button>
+
+        <!-- ŘÁDEK 6: Popis práce – celý řádek -->
+        <div style="margin-top:12px;">
+          <label data-i18n="form_desc">Popis práce</label>
+          <textarea id="srvDesc" rows="4" placeholder=""></textarea>
+        </div>
+
+        <!-- ŘÁDEK 7: Technik | Externí technik -->
+        <div class="grid grid-2" style="margin-top:12px;">
+          <div>
+            <label data-i18n="form_tech">Technik</label>
+            <div id="srvTechMultiWrap" style="position:relative;">
+              <button type="button" id="srvTechToggle" class="btn" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:400;background:var(--input-bg,var(--card));border:1px solid var(--border);border-radius:10px;">
+                <span id="srvTechDisplay">– vyber –</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="srvTechDropdown" class="hidden" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 4px;max-height:220px;overflow-y:auto;box-shadow:0 4px 24px #0006;">
+                <div id="srvTechList"></div>
+              </div>
+            </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <label data-i18n="form_ext_tech">Externí technik</label>
+              <input id="srvExtTech" type="text" placeholder="" />
+            </div>
+            <!-- Fotky a soubory -->
+            <div>
+              <button id="srvPickPhotos" class="btn">Vybrat fotky…</button>
+              <span id="srvPhotoCount" class="muted">0 souborů</span>
+            </div>
+            <div id="srvPhotoPreview" class="thumbs"></div>
+            <div>
+              <button id="srvPickFiles" class="btn">Přidat soubory…</button>
+              <span id="srvFileCount" class="muted">0 souborů</span>
+            </div>
+            <div id="srvFileList" class="soft"></div>
+          </div>
+        </div>
+
+        <!-- Automatická složka – skryta, jen pro interní logiku -->
+        <input id="srvFolder" type="hidden" />
+
+        <div class="divider" style="margin-top:16px;"></div>
+        <div class="row" style="justify-content:space-between; align-items:center; margin-top:12px;">
+          <div>
+            <button id="srvMarkBack" type="button" class="btn">Vrácen do provozu</button>
+            <span id="srvMarkBackHint" class="soft" style="font-size:12px;margin-left:6px;"></span>
+          </div>
+          <div>
+            <button id="srvMarkOut" type="button" class="btn">Dán do údržby</button>
+            <span id="srvMarkOutHint" class="soft" style="font-size:12px;margin-left:6px;"></span>
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-end; margin-top:12px;">
+          <button id="srvSave" class="btn">Uložit záznam</button>
+          <button id="srvCancelEdit" class="btn hidden">Zrušit úpravy</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="secServisHist" class="hidden">
+      <div class="card">
+        <div class="section-title">
+          <h2>Servisní historie</h2>
+          <div class="row no-print">
+            <button id="exportCSV" class="btn">Exportovat do Excel (CSV)</button>
+            <button id="exportPrint" class="btn">Tisk / PDF</button>
+          </div>
+        </div>
+        <div id="srvCount" class="tag">0 záznamů</div>
+
+        <div class="card no-print">
+          <div class="row" style="gap:10px; align-items:end; flex-wrap:wrap;">
+            <div style="flex:2; min-width:220px;">
+              <label>Hledat</label>
+              <input id="histSearch" type="text" placeholder="typ / sériové / název / ticket / díl / technik..." />
+            </div>
+            <div style="flex:1; min-width:160px;">
+              <label>Typ</label>
+              <select id="histType">
+                <option value="ALL">Vše</option>
+                <option value="Jiné">Jiné</option>
+                <option value="RS11">RS11</option>
+                <option value="P40">P40</option>
+              </select>
+            </div>
+            <div style="flex:1; min-width:160px;">
+              <label>Stav</label>
+              <select id="histStatus">
+                <option value="ANY">Jakýkoliv</option>
+                <option value="BACK">Vrácen</option>
+                <option value="OUT">Mimo provoz</option>
+                <option value="NEUTRAL">Neutrální</option>
+              </select>
+            </div>
+            <div style="flex:1; min-width:160px;">
+              <label>Technik</label>
+              <select id="histTech"><option value="ALL">Všichni</option></select>
+            </div>
+            <div style="flex:1; min-width:160px;">
+              <label>Od data</label>
+              <input id="histFrom" type="date" />
+            </div>
+            <div style="flex:1; min-width:160px;">
+              <label>Do data</label>
+              <input id="histTo" type="date" />
+            </div>
+            <div style="flex:1; min-width:180px;">
+              <label>Řazení</label>
+              <select id="histSort">
+                <option value="DESC">Nejnovější nahoře</option>
+                <option value="ASC">Nejstarší nahoře</option>
+              </select>
+            </div>
+            <div>
+              <button id="histClear" class="btn">Vymazat filtry</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="srvList" class="grid" style="grid-template-columns:1fr; max-height:none;"></div>
+      </div>
+    </section>
+
+    <section id="secUdrzba" class="hidden">
+      <div class="card">
+        <div class="section-title"><h2>Roboti mimo provoz</h2>
+          <div class="row">
+            <label id="maintFilterLabel" class="soft">Filtrovat:</label>
+            <select id="maintFilterType">
+              <option value="ALL">Vše</option>
+              <option value="RS11">RS11</option>
+              <option value="P40">P40</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="gap:10px; align-items:end; flex-wrap:wrap;">
+          <div style="flex:2; min-width:220px;">
+            <label id="maintSearchLabel">Hledat</label>
+            <input id="maintSearch" type="text" placeholder="sériové / název / ticket / technik..." />
+          </div>
+          <div style="flex:1; min-width:160px;">
+            <label id="maintSortLabel">Řazení</label>
+            <select id="maintSort">
+              <option value="SERIAL">Podle sériového čísla</option>
+              <option value="DATE">Podle data (nejnovější)</option>
+            </select>
+          </div>
+        </div>
+        <div id="maintList" class="grid"></div>
+      </div>
+    </section>
+
+    <section id="secStats" class="hidden">
+      <div class="grid grid-3" style="margin-bottom:16px;">
+        <div class="card kpi"><div><div class="muted" id="kpiServLabel">Servisních záznamů</div><b id="kpiServ">0</b></div></div>
+        <div class="card kpi"><div><div class="muted" id="kpiOutLabel">Robotů mimo provoz</div><b id="kpiOut">0</b></div></div>
+        <div class="card kpi"><div><div class="muted" id="kpiPartsLabel">Počet dílů v katalogu</div><b id="kpiParts">0</b></div></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:12px;">
+          <h2 id="statsChartTitle">Graf odstávek robotů</h2>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <button class="btn stats-period-btn active-period" data-period="all" onclick="setStatsPeriod(this)">📋 <span id="spAll">Celkem</span></button>
+            <button class="btn stats-period-btn" data-period="year" onclick="setStatsPeriod(this)">📆 <span id="spYear">Ročně</span></button>
+            <button class="btn stats-period-btn" data-period="quarter" onclick="setStatsPeriod(this)">📊 <span id="spQuarter">Čtvrtletně</span></button>
+            <button class="btn stats-period-btn" data-period="month" onclick="setStatsPeriod(this)">📅 <span id="spMonth">Měsíčně</span></button>
+          </div>
+        </div>
+        <div id="statsChartWrap"><canvas id="statsChart"></canvas></div>
+        <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;">
+          <span style="font-size:.8em;color:#dc4646;">■ 8+ dní — kritické</span>
+          <span style="font-size:.8em;color:#d29620;">■ 4–7 dní — varování</span>
+          <span style="font-size:.8em;color:#22a052;">■ 0–3 dny — OK</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px;"><h2 id="statsReliTitle">Přehled spolehlivosti robotů</h2></div>
+        <div style="overflow-x:auto;">
+          <table class="table reliability-table">
+            <thead><tr><th id="thRelRobot">Robot</th><th id="thRelCount">Zásahy</th><th id="thRelDays">Celkem dní</th><th id="thRelFault">Nejčastější závada</th><th id="thRelRel">Spolehlivost</th></tr></thead>
+            <tbody id="reliabilityTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="secParts" class="hidden">
+      <div class="card">
+        <div class="section-title">
+          <h2 id="partsSecTitle">Náhradní díly</h2>
+          <button id="addPart" class="btn">Přidat díl</button>
+        </div>
+        <div class="parts-tab-bar">
+          <button class="btn tab-active" id="tabPartsList" onclick="switchPartsTab('list')">📋 <span id="tabListLabel">Seznam dílů</span></button>
+          <button class="btn" id="tabPartsHist" onclick="switchPartsTab('hist')">🕐 <span id="tabHistLabel">Historie použití</span></button>
+        </div>
+        <div id="partsViewList">
+          <div class="parts-filter-bar">
+            <input id="partsSearch" type="text" placeholder="Hledat díl..." oninput="renderParts()" />
+            <span class="pf-btn pf-active" data-pf="ALL" onclick="setPartsFilter(this)">Vše</span>
+            <span class="pf-btn" data-pf="RS11" onclick="setPartsFilter(this)">RS11</span>
+            <span class="pf-btn" data-pf="P40" onclick="setPartsFilter(this)">P40</span>
+            <span class="pf-btn" data-pf="Jiné" onclick="setPartsFilter(this)">Jiné</span>
+          </div>
+          <table class="table" id="partsTable">
+            <thead><tr><th id="thPartName">Název</th><th id="thPartNo">Číslo</th><th class="right" id="thPartQty">Ks</th><th id="thPartType">Typ</th><th id="thPartAdded">Evidováno</th><th id="thPartUpdated">Poslední změna</th><th class="right" id="thPartActions">Akce</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="partsViewHist" class="hidden">
+          <table class="table" id="partsHistTable">
+            <thead><tr><th id="thPhName">Název dílu</th><th id="thPhNo">Číslo dílu</th><th id="thPhDate">Datum použití</th><th id="thPhTech">Kdo použil</th><th class="right" id="thPhQty">Ks</th><th id="thPhSerial">Sériové č. robota</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="secExport" class="hidden">
+      <div class="card">
+        <div class="section-title"><h2>Export/backup</h2></div>
+        <div class="row">
+          <button id="exportXLSX" class="btn">Export historie do XLSX</button>
+          <button id="exportPDF" class="btn">Export historie do PDF</button>
+          <button id="exportPartsPDF" class="btn">Export dílů do PDF</button>
+          <button id="exportServJSON" class="btn">Stáhnout servisni.json</button>
+          <button id="exportPartsJSON" class="btn">Stáhnout dily.json</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const I18N = {
+      cs: {
+        nav_home: "Domů", nav_service: "Servis", nav_maintenance: "Údržba", nav_stats: "Statistiky", nav_parts: "Náhradní díly", nav_export: "Export",
+        gate_title: "Vítej v „Geek+ by LT/VFX – Evidence robotů“",
+        gate_desc: "Nejdříve prosím vyber sdílenou OneDrive složku \\\\OneDrive - LogTech, s.r.o\\\\Geek Ticket portál\\\\data",
+        folder_loaded: "Složka načtena",
+        ph_title: "např. výměna senzoru",
+        ph_part_catalog: "vyplní se volbou z katalogu / nebo ručně",
+        ph_desc: "co se dělalo...",
+        ph_ext_tech: "např. servis dodavatele…",
+        maint_col_serial: "Sériové číslo",
+        maint_col_tech: "Technik",
+        maint_col_days: "Dní mimo provoz",
+        maint_detail_tech: "Technik",
+        maint_detail_ticket: "Ticket",
+        maint_detail_type: "Typ",
+        maint_detail_parts: "Díly",
+        maint_no_records: "Žádné detailní záznamy.",
+        gate_btn: "Vybrat složku /data",
+        service_title: "Servis", service_new: "ZAPSAT ZÁZNAM", service_hist: "HISTORIE",
+        form_title: "Nový servisní záznam", form_type: "Typ robota", form_serial: "Sériové číslo", form_date: "Datum", form_time: "Čas", form_pick_photos: "Vybrat fotky…", form_add_files: "Přidat soubory…",
+        form_headline: "Nadpis úkonu", form_ticket: "Geek ticket", form_ticket_link: "Geek ticket link", form_part_from_catalog: "Díl z katalogu",
+        form_part_no: "Číslo dílu", form_part_name: "Název dílu", form_desc: "Popis práce", form_tech: "Technik", form_ext_tech: "Externí technik", form_other: "Jiné/Ostatní",
+        form_pick_photos: "Vybrat fotky…", form_add_files: "Přidat soubory…", form_auto_folder: "Automatická složka", form_save: "Uložit záznam", form_save_changes: "Uložit změny", form_cancel: "Zrušit úpravy",
+        tri_back: "Vrácen do provozu", tri_out: "Dán do údržby",
+        hist_title: "Servisní historie", hist_export_csv: "Exportovat do Excel (CSV)", hist_export_pdf: "Tisk / PDF",
+        filter_search: "Hledat", filter_type: "Typ", filter_status: "Stav", filter_tech: "Technik", filter_from: "Od data", filter_to: "Do data", filter_sort: "Řazení", filter_clear: "Vymazat filtry",
+        sort_latest: "Nejnovější nahoře", sort_oldest: "Nejstarší nahoře",
+        filter_all: "Vše", filter_all_tech: "Všichni", status_any: "Jakýkoliv", status_back: "Vrácen", status_out: "Mimo provoz", status_neutral: "Neutrální",
+        tag_returned: "vrácen", tag_out: "mimo provoz", photos_show: "Zobrazit fotky", files_show: "Zobrazit soubory",
+        btn_edit: "Editovat", btn_delete: "Smazat (i složku)",
+        all_ok: "Žádný robot není mimo provoz.",
+        parts_title: "Náhradní díly", parts_add: "Přidat díl", parts_name: "Název", parts_number: "Číslo", parts_qty: "Ks", parts_type: "Typ", parts_added: "Evidováno", partslastupdate: "Poslední změna", parts_actions: "Akce", parts_plus: "+1", parts_tab_list: "Seznam dílů", parts_tab_hist: "Historie použití", parts_hist_name: "Název dílu", parts_hist_no: "Číslo dílu", parts_hist_date: "Datum použití", parts_hist_tech: "Kdo použil", parts_hist_qty: "Ks", parts_hist_serial: "Sériové č. robota",
+        export_title: "Export/backup", export_parts_pdf: "Export dílů do PDF", export_serv: "Stáhnout servisni.json", export_parts: "Stáhnout dily.json",
+        maint_title: "Roboti mimo provoz", maint_filter: "Filtrovat:", maint_all: "Vše", maint_search: "Hledat", maint_search_ph: "sériové / název / ticket / technik...", maint_sort_label: "Řazení", maint_sort_serial: "Podle sériového čísla", maint_sort_date: "Podle data (nejnovější)", maint_ks: "ks",
+        csv_headers: ["Datum","Čas","Typ","Sériové číslo","Nadpis","Ticket","Použité díly","Technik","Vyřazen z provozu","Vrácen do provozu","Popis"],
+        L_out: "Vyřazen z provozu", L_returned: "Vrácen do provozu",
+        alert_saved: "Záznam uložen.", alert_updated: "Záznam upraven.", files_count: (n) => `${n} souborů`, alert_folder_pick_fail: "Výběr složky byl zrušen nebo selhal.", alert_choose_data: "Nejprve zvolte složku /data.", alert_no_stock: "Na skladě už není žádný kus tohoto dílu.",
+        form_ext_tech: "Externí technik",
+        form_title_new: "Nový servisní záznam",
+        form_title_edit: "Upravit servisní záznam",
+        kpi_records: "Servisních záznamů", stats_chart_title: "Graf odstávek robotů", stats_period_all: "Celkem", stats_period_month: "Měsíčně", stats_period_quarter: "Čtvrtletně", stats_period_year: "Ročně", stats_reli_title: "Přehled spolehlivosti robotů", stats_col_robot: "Robot", stats_col_count: "Zásahy", stats_col_days: "Celkem dní", stats_col_fault: "Nejčastější závada", stats_col_reli: "Spolehlivost",
+        kpi_out: "Robotů mimo provoz",
+        kpi_parts: "Počet dílů v katalogu",
+        parts_unit: "ks",
+        sort_robot: "Robot",
+        sort_title: "Nadpis",
+        sort_date: "Od data",
+        sort_days: "Dní",
+        sort_status: "Stav",
+        del_record_confirm: "Zadej heslo pro smazání záznamu:",
+        del_part_confirm: "Zadej heslo pro smazání dílu:",
+        del_wrong_pw: "Nesprávné heslo. Záznam nebyl smazán.",
+        del_wrong_pw_part: "Nesprávné heslo. Díl nebyl smazán.",
+        export_xlsx: "Export historie do XLSX",
+        export_pdf: "Export historie do PDF",
+        parts_pw_plus: "Zadej heslo pro přidání kusu:",
+        parts_pw_edit: "Zadej heslo pro editaci dílu:",
+        parts_pw_wrong: "Nesprávné heslo. Akce zrušena.",
+        maint_days: "dní na údržbě"
+      
+      },
+      en: {
+        nav_home: "Home", nav_service: "Service", nav_maintenance: "Maintenance", nav_stats: "Stats", nav_parts: "Spare Parts", nav_export: "Export",
+        gate_title: "Welcome to “Geek+ by LT/VFX – Robot Records”",
+        gate_desc: "Please select the shared OneDrive folder \\\\OneDrive - LogTech, s.r.o\\\\Geek Ticket portál\\\\data",
+        folder_loaded: "Folder loaded",
+        ph_title: "e.g. sensor replacement",
+        ph_part_catalog: "filled in from catalog / or manually",
+        ph_desc: "what was done...",
+        ph_ext_tech: "e.g. supplier service…",
+        maint_col_serial: "Serial number",
+        maint_col_tech: "Technician",
+        maint_col_days: "Days out of service",
+        maint_detail_tech: "Technician",
+        maint_detail_ticket: "Ticket",
+        maint_detail_type: "Type",
+        maint_detail_parts: "Parts",
+        maint_no_records: "No detailed records.",
+        gate_btn: "Pick /data folder",
+        service_title: "Service", service_new: "ADD RECORD", service_hist: "HISTORY",
+        form_title: "New service record", form_type: "Robot type", form_serial: "Serial number", form_date: "Date", form_time: "Time",
+        form_headline: "Task title", form_ticket: "Geek ticket", form_ticket_link: "Geek ticket link", form_part_from_catalog: "Part from catalog",
+        form_part_no: "Part number", form_part_name: "Part name", form_desc: "Work description", form_tech: "Technician", form_ext_tech: "External technician", form_other: "Other",
+        form_pick_photos: "Pick photos…", form_add_files: "Add files…", form_auto_folder: "Auto folder", form_save: "Save record", form_save_changes: "Save changes", form_cancel: "Cancel edit", form_date: "Date", form_time: "Time",
+        tri_back: "Returned to operation", tri_out: "Put into maintenance",
+        hist_title: "Service history", hist_export_csv: "Export to Excel (CSV)", hist_export_pdf: "Print / PDF",
+        filter_search: "Search", filter_type: "Type", filter_status: "Status", filter_tech: "Technician", filter_from: "From date", filter_to: "To date", filter_sort: "Sort", filter_clear: "Clear filters",
+        sort_latest: "Newest first", sort_oldest: "Oldest first",
+        filter_all: "All", filter_all_tech: "All technicians", status_any: "Any", status_back: "Returned", status_out: "Out of service", status_neutral: "Neutral",
+        tag_returned: "returned", tag_out: "out of service", photos_show: "Show photos", files_show: "Show files",
+        btn_edit: "Edit", btn_delete: "Delete (and folder)",
+        all_ok: "No robots are out of service.",
+        parts_title: "Spare parts", parts_add: "Add part", parts_name: "Name", parts_number: "Number", parts_qty: "Qty", parts_type: "Type", parts_added: "Recorded", partslastupdate: "Last update", parts_actions: "Actions", parts_plus: "+1", parts_tab_list: "Parts list", parts_tab_hist: "Usage history", parts_hist_name: "Part name", parts_hist_no: "Part number", parts_hist_date: "Date used", parts_hist_tech: "Used by", parts_hist_qty: "Qty", parts_hist_serial: "Robot serial",
+        export_title: "Export/backup", export_serv: "Download servisni.json", export_parts: "Download dily.json",
+        maint_title: "Robots out of service", maint_filter: "Filter:", maint_all: "All", maint_search: "Search", maint_search_ph: "serial / title / ticket / technician...", maint_sort_label: "Sort", maint_sort_serial: "By serial number", maint_sort_date: "By date (newest)", maint_ks: "pcs",
+        csv_headers: ["Date","Time","Type","Serial","Title","Ticket","Used parts","Technician","Out of service","Returned to service","Description"],
+        L_out: "Out of service", L_returned: "Returned to service",
+        alert_saved: "Record saved.", alert_updated: "Record updated.", files_count: (n) => `${n} files`, alert_folder_pick_fail: "Folder selection was canceled or failed.", alert_choose_data: "Pick the /data folder first.", alert_no_stock: "No stock left for this part.",
+        form_ext_tech: "External technician",
+        form_title_new: "New service record",
+        form_title_edit: "Edit service record",
+        kpi_records: "Service records", stats_chart_title: "Robot downtime chart", stats_period_all: "All time", stats_period_month: "Monthly", stats_period_quarter: "Quarterly", stats_period_year: "Yearly", stats_reli_title: "Robot reliability overview", stats_col_robot: "Robot", stats_col_count: "Interventions", stats_col_days: "Total days", stats_col_fault: "Most common fault", stats_col_reli: "Reliability",
+        kpi_out: "Robots out of service",
+        kpi_parts: "Parts in catalog",
+        parts_unit: "pcs",
+        sort_robot: "Robot",
+        sort_title: "Title",
+        sort_date: "Date",
+        sort_days: "Days",
+        sort_status: "Status",
+        del_record_confirm: "Enter password to delete record:",
+        del_part_confirm: "Enter password to delete part:",
+        del_wrong_pw: "Wrong password. Record was not deleted.",
+        del_wrong_pw_part: "Wrong password. Part was not deleted.",
+        export_xlsx: "Export history to XLSX",
+        export_pdf: "Export history to PDF",
+        export_parts_pdf: "Export parts to PDF",
+        parts_pw_plus: "Enter password to add stock:",
+        parts_pw_edit: "Enter password to edit part:",
+        parts_pw_wrong: "Wrong password. Action cancelled.",
+        maint_days: "days in maintenance"
+      
+      }
+    };
+    let LANG = 'cs';
+    function t(k){ return (I18N[LANG] && I18N[LANG][k]) || k; }
+    function setLang(newLang){ LANG = newLang; applyI18n(); renderServisList(); renderMaintenance(); renderParts(); }
+
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    let dataDir = null;
+    let servis = [];
+    let dily = [];
+    let photoHandles = [];
+    let fileHandles = [];
+    let editIndex = -1;
+    let srvStatus = 'none';
+    const RS11 = ["41220","41221","41222","41223","41224","41225","41226","41227","41228","41229","41230","41231","41232","41233","41234","41235","41236","41237","45123","45124","55804","55820","55821"];
+    const P40 = ["41910","41911","41912","41913","41914","41949","41950","41951","41952","41953","41954","41955","41956","41957","41958","41959","41960","41961","41962","41963","41964","41965","41966","41967","41968","41969","41970","41971","41972","41973","41974","41975","41976","41977","41978","41979","41980","41981","41982","41983","41984","41985","41986","41987","41988","42623","42624","42589","42590","42718"];
+
+    function niceNow() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      return { date: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}` };
+    }
+
+    let cloudSaving = false;
+    async function ensureJSON(name) { return TicketCloud.initial(name); }
+    async function writeJSON(name, obj) {
+      if (cloudSaving && name === 'dily.json') return;
+      await TicketCloud.save(servis, dily);
+    }
+    async function saveServisRecord() {
+      if (cloudSaving) return;
+      cloudSaving = true;
+      $('#srvSave').disabled = true;
+      try { await saveServisRecordCloud(); }
+      catch(error) {
+        const previous = TicketCloud.previous();
+        if(previous) {servis=previous.servis;dily=previous.dily;}
+        renderServisList(); renderParts(); refreshKPIs();
+        alert(error.message + '\nPřed dalším ukládáním obnov stránku. Formulář nyní zůstává otevřený.');
+      } finally {cloudSaving=false;$('#srvSave').disabled=false;}
+    }
+
+    function downloadJSON(filename, data) {
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+    }
+
+    function bindGoto(){ document.querySelectorAll('[data-goto]').forEach(btn => btn.addEventListener('click', e => goto(e.currentTarget.dataset.goto))); }
+    function goto(id) {
+      $$('section').forEach(s => s.classList.add('hidden'));
+      $('#'+id).classList.remove('hidden');
+      const map = { secHome:'secHome', secServisHome:'secServisHome', secServisForm:'secServisHome', secServisHist:'secServisHome', secUdrzba:'secUdrzba', secStats:'secStats', secParts:'secParts', secExport:'secExport' };
+      const active = map[id] || id;
+      $$('#topNav [data-goto]').forEach(b => b.classList.toggle('active', b.dataset.goto === active));
+      if (id === 'secServisHist') { populateTechFilter(); attachHistFilterEvents(); renderServisList(); }
+      if (id === 'secStats') { window._statsPeriod = window._statsPeriod||'all'; renderStatsChart(); renderReliability(); }
+      if (id === 'secUdrzba') { if(typeof renderMaintenance==='function') renderMaintenance(); }
+      if (id === 'secParts') { renderParts(); }
+    }
+
+    function setPartsFilter(el){
+      document.querySelectorAll('.pf-btn').forEach(e=>e.classList.remove('pf-active'));
+      el.classList.add('pf-active'); renderParts();
+    }
+    function switchPartsTab(tab){
+      const isList=tab==='list';
+      document.getElementById('partsViewList').classList.toggle('hidden',!isList);
+      document.getElementById('partsViewHist').classList.toggle('hidden',isList);
+      document.getElementById('tabPartsList').classList.toggle('tab-active',isList);
+      document.getElementById('tabPartsHist').classList.toggle('tab-active',!isList);
+      const ap=$('#addPart'); if(ap) ap.style.display=isList?'':'none';
+      if(!isList) renderPartsHistory();
+    }
+    function renderPartsHistory(){
+      const tb=$('#partsHistTable tbody'); if(!tb) return; tb.innerHTML='';
+      const rows=[];
+      servis.forEach(rec=>{
+        // Nový formát: rec.parts = [{ partNo, partName }]
+        const partItems = (Array.isArray(rec.parts) && rec.parts.length > 0 && typeof rec.parts[0] === 'object' && 'partNo' in rec.parts[0])
+          ? rec.parts.filter(p => p.partNo || p.partName)
+          : (rec.partNo || rec.partName ? [{ partNo: rec.partNo||'', partName: rec.partName||'' }] : []);
+        partItems.forEach(pi => {
+          rows.push({name:pi.partName||'',number:pi.partNo||'',date:rec.date||'',
+            tech:Array.isArray(rec.tech)?rec.tech.join(', '):(rec.tech||''),
+            serial:(rec.type||'')+(rec.serial?' · '+rec.serial:'')});
+        });
+      });  // konec servis.forEach
+      if(!rows.length){
+        tb.innerHTML=`<tr><td colspan="6" class="center muted" style="padding:20px;">${LANG==='cs'?'Žádné záznamy s použitými díly.':'No records with used parts.'}</td></tr>`;
+        return;
+      }
+      rows.forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${r.name}</td><td>${r.number}</td><td>${r.date}</td><td>${r.tech}</td><td class="right">1</td><td>${r.serial}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+    
+    function setStatsPeriod(el) {
+      document.querySelectorAll('.stats-period-btn').forEach(b=>b.classList.remove('active-period'));
+      el.classList.add('active-period');
+      window._statsPeriod = el.dataset.period || 'month';
+      renderStatsChart();
+    }
+    function renderStatsChart(){
+      const canv=document.getElementById('statsChart');
+      if(!canv||typeof Chart==='undefined') return;
+      const period = window._statsPeriod || 'month';
+      const robotDays = calcRobotDownDaysByPeriod(period);
+      const labels=Object.keys(robotDays), values=Object.values(robotDays);
+      const colors=values.map(v=>v>=8?'#dc4646':v>=4?'#d29620':'#22a052');
+      const bgColors=values.map(v=>v>=8?'rgba(220,70,70,.18)':v>=4?'rgba(210,150,30,.18)':'rgba(34,160,82,.18)');
+      if(window._statsCI){window._statsCI.destroy();window._statsCI=null;}
+      const wrap=document.getElementById('statsChartWrap');
+      if(!labels.length){
+        wrap.innerHTML='<canvas id="statsChart"></canvas><p class="center muted" style="padding:16px;">'+(LANG==='cs'?'Žádná data.':'No data.')+'</p>';
+        return;
+      }
+      window._statsCI=new Chart(canv,{type:'bar',data:{labels,datasets:[{
+        label:LANG==='cs'?'Dní mimo provoz':'Days out of service',
+        data:values,backgroundColor:bgColors,borderColor:colors,borderWidth:2,borderRadius:6
+      }]},options:{responsive:true,plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>ctx.parsed.y+(LANG==='cs'?' dní':' days')}}},
+        scales:{y:{beginAtZero:true,ticks:{color:'#888',stepSize:1},grid:{color:'rgba(255,255,255,.05)'},
+          title:{display:true,text:LANG==='cs'?'Počet dní':'Days',color:'#888'}},
+          x:{ticks:{color:'#aaa',maxRotation:30},grid:{display:false}}}}});
+    }
+    function calcRobotDownDaysByPeriod(period) {
+      const now = new Date(); now.setHours(0,0,0,0);
+      let periodStart = null;
+      if(period === 'month') {
+        periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      } else if(period === 'quarter') {
+        const q = Math.floor(now.getMonth()/3);
+        periodStart = new Date(now.getFullYear(), q*3, 1);
+      } else if(period === 'year') {
+        periodStart = new Date(now.getFullYear(), 0, 1);
+      }
+      // period === 'all' -> periodStart = null -> bez omezení
+      const robots = {};
+      servis.forEach(rec => {
+        if(!rec.serial) return;
+        const key = (rec.type||'?') + ' · ' + rec.serial;
+        if(!robots[key]) robots[key] = [];
+        robots[key].push(rec);
+      });
+      const result = {};
+      Object.entries(robots).forEach(([key, recs]) => {
+        recs.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+        let totalDays = 0;
+        recs.forEach((rec, idx) => {
+          const isOut = rec.back === false || rec.back === 'false';
+          if(!isOut) return;
+          const start = new Date(rec.date); start.setHours(0,0,0,0);
+          if(isNaN(start.getTime())) return;
+          // Najdi nejbližší back=true po tomto záznamu
+          let end = null;
+          for(let j=idx+1; j<recs.length; j++) {
+            if(recs[j].back === true || recs[j].back === 'true') {
+              end = new Date(recs[j].date); end.setHours(0,0,0,0); break;
+            }
+          }
+          if(!end) end = new Date(now); // stále mimo provoz
+          if(periodStart) {
+            // Ořezat na dané období
+            if(end < periodStart) return; // odstávka skončila před obdobím
+            const clampStart = start < periodStart ? periodStart : start;
+            const clampEnd = end > now ? now : end;
+            const days = Math.max(1, Math.round((clampEnd - clampStart) / 86400000));
+            totalDays += days;
+          } else {
+            // Celkem – bez omezení
+            const clampEnd = end > now ? now : end;
+            const days = Math.max(1, Math.round((clampEnd - start) / 86400000));
+            totalDays += days;
+          }
+        });
+        if(totalDays > 0) result[key] = totalDays;
+      });
+      return result;
+    }
+    
+    function calcRobotDownDays(filterMonth) {
+      // Seskupíme záznamy per robot, seřadíme dle data
+      const robots = {};
+      servis.forEach(rec => {
+        if(!rec.serial) return;
+        const key = (rec.type||'?') + ' · ' + rec.serial;
+        if(!robots[key]) robots[key] = [];
+        robots[key].push(rec);
+      });
+      const result = {};
+      const today = new Date(); today.setHours(0,0,0,0);
+      Object.entries(robots).forEach(([key, recs]) => {
+        recs.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+        let totalDays = 0;
+        recs.forEach((rec, i) => {
+          const isOut = rec.back === false || rec.back === 'false';
+          if(!isOut) return;
+          // Datum začátku odstávky
+          const start = new Date(rec.date); start.setHours(0,0,0,0);
+          if(isNaN(start.getTime())) return;
+          // Najdeme nejbližší záznam "vrácen do provozu" (back=true) po tomto datu
+          let end = null;
+          for(let j=i+1; j<recs.length; j++) {
+            if(recs[j].back === true || recs[j].back === 'true') {
+              end = new Date(recs[j].date); end.setHours(0,0,0,0); break;
+            }
+          }
+          if(!end) end = today; // stále mimo provoz
+          const days = Math.max(1, Math.round((end - start) / 86400000));
+          // Filtr měsíce: zahrneme pokud odstávka zasahuje do daného měsíce
+          if(filterMonth) {
+            const [fy, fm] = filterMonth.split('-').map(Number);
+            const monthStart = new Date(fy, fm-1, 1);
+            const monthEnd = new Date(fy, fm, 0);
+            if(end < monthStart || start > monthEnd) return;
+            // Ořežeme na daný měsíc
+            const clampStart = start < monthStart ? monthStart : start;
+            const clampEnd = end > monthEnd ? monthEnd : end;
+            totalDays += Math.max(1, Math.round((clampEnd - clampStart) / 86400000));
+          } else {
+            totalDays += days;
+          }
+        });
+        if(totalDays > 0) result[key] = totalDays;
+      });
+      return result;
+    }
+    
+    function renderReliability(){
+      const tb=$('#reliabilityTbody'); if(!tb) return; tb.innerHTML='';
+      const robots = {};
+      servis.forEach(rec => {
+        if(!rec.serial) return;
+        const key = (rec.type||'?') + ' · ' + rec.serial;
+        if(!robots[key]) robots[key] = {recs:[], faults:{}};
+        robots[key].recs.push(rec);
+        const f = (rec.title||'').trim(); if(f) robots[key].faults[f] = (robots[key].faults[f]||0)+1;
+      });
+      const downDays = calcRobotDownDaysByPeriod('all');
+      const entries = Object.entries(robots).sort((a,b) => (downDays[b[0]]||0) - (downDays[a[0]]||0));
+      if(!entries.length){
+        tb.innerHTML=`<tr><td colspan="5" class="center muted" style="padding:16px;">${LANG==='cs'?'Žádná data.':'No data.'}</td></tr>`;
+        return;
+      }
+      entries.forEach(([robot, d]) => {
+        const count = d.recs.length;
+        const days = downDays[robot] || 0;
+        const top = Object.entries(d.faults).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+        const badge = days>=8 ? `<span class="badge-low">${LANG==='cs'?'Nízká':'Low'}</span>`
+                    : days>=4 ? `<span class="badge-mid">${LANG==='cs'?'Střední':'Medium'}</span>`
+                              : days>0 ? `<span class="badge-ok">${LANG==='cs'?'Dobrá':'Good'}</span>`
+                              : `<span class="badge-ok">${LANG==='cs'?'V provozu':'Running'}</span>`;
+        const tr = document.createElement('tr');
+        tr.innerHTML=`<td><b>${robot}</b></td><td>${count}</td><td>${days}</td><td class="muted">${top}</td><td>${badge}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+    
+    function refreshKPIs() {
+      $('#kpiServ').textContent = servis.length;
+      $('#kpiParts').textContent = dily.length;
+      const out = computeOutOfService();
+      $('#kpiOut').textContent = out.total;
+    }
+
+    function applyI18n(){
+      const navBtns = document.querySelectorAll('#topNav [data-goto]');
+      const navText = [t('nav_home'), t('nav_service'), t('nav_maintenance'), t('nav_stats'), t('nav_parts'), t('nav_export')];
+      navBtns.forEach((b,i)=> b.textContent = navText[i] || b.textContent);
+      $('#secServisHome h2').textContent = t('service_title');
+      document.querySelector('#secServisHome [data-goto="secServisForm"]').textContent = t('service_new');
+      document.querySelector('#secServisHome [data-goto="secServisHist"]').textContent = t('service_hist');
+      const home = $('#secHome');
+      if (home){
+        const cards = home.querySelectorAll('.card');
+        cards[0].querySelector('.home-big').textContent = t('nav_service');
+        cards[0].querySelector('.soft').textContent = LANG==='cs' ? 'záznamy, historie, fotky' : 'records, history, photos';
+        cards[0].querySelector('button').textContent = LANG==='cs' ? 'Otevřít' : 'Open';
+        cards[1].querySelector('.home-big').textContent = t('nav_maintenance');
+        cards[1].querySelector('.soft').textContent = LANG==='cs' ? 'stav robotů mimo provoz' : 'robots out of service';
+        cards[1].querySelector('button').textContent = LANG==='cs' ? 'Otevřít' : 'Open';
+        cards[2].querySelector('.home-big').textContent = t('nav_parts');
+        cards[2].querySelector('.soft').textContent = LANG==='cs' ? 'katalog a zásoby' : 'catalog & stock';
+        cards[2].querySelector('button').textContent = LANG==='cs' ? 'Otevřít' : 'Open';
+      }
+      const labels = document.querySelectorAll('#secServisForm label');
+      const mapOrder = ['form_type','form_serial','form_date','form_time','form_headline','form_ticket','form_part_from_catalog','form_part_no','form_part_name','form_desc','form_tech','form_auto_folder'];
+      let idx=0; labels.forEach(l=>{ if (idx<mapOrder.length) { l.childNodes[0].nodeValue = t(mapOrder[idx]) + ' '; idx++; } });
+      $('#srvMarkBack').textContent = t('tri_back');
+      $('#srvMarkOut').textContent = t('tri_out');
+      $('#srvSave').textContent = editIndex===-1 ? t('form_save') : t('form_save_changes');
+      $('#srvCancelEdit').textContent = t('form_cancel');
+      // Přeložit labely s data-i18n atributem v celém dokumentu
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const val = t(key);
+        if (val && typeof val === 'string') el.textContent = val;
+      });
+      const typeOpt = document.querySelector('#srvType option[value="Jiné"]'); if (typeOpt) typeOpt.textContent = t('form_other');
+      $('#srvPickPhotos').textContent = t('form_pick_photos');
+      $('#srvPickFiles').textContent = t('form_add_files');
+      document.querySelector('#secServisHist h2').textContent = t('hist_title');
+      $('#exportCSV').textContent = t('hist_export_csv');
+      $('#exportPrint').textContent = t('hist_export_pdf');
+      document.querySelector('#secParts h2').textContent = t('parts_title');
+      $('#addPart').textContent = t('parts_add');
+      const partHead = document.querySelector('#partsTable thead tr');
+      if (partHead) partHead.innerHTML = `<th>${t('parts_name')}</th><th>${t('parts_number')}</th><th class="right">${t('parts_qty')}</th><th>${t('parts_added')}</th><th>${t('partslastupdate')}</th><th class="right">${t('parts_actions')}</th>`;
+      document.querySelector('#secExport h2').textContent = t('export_title');
+      if ($('#exportXLSX')) $('#exportXLSX').textContent = t('export_xlsx');
+      if ($('#exportPDF')) $('#exportPDF').textContent = t('export_pdf');
+      if ($('#exportPartsPDF')) $('#exportPartsPDF').textContent = t('export_parts_pdf');
+      if ($('#exportServJSON')) $('#exportServJSON').textContent = t('export_serv');
+      if ($('#exportPartsJSON')) $('#exportPartsJSON').textContent = t('export_parts');
+      const histLabels = document.querySelectorAll('#secServisHist .no-print label');
+      if (histLabels[0]) histLabels[0].textContent = t('filter_search');
+      if (histLabels[1]) histLabels[1].textContent = t('filter_type');
+      if (histLabels[2]) histLabels[2].textContent = t('filter_status');
+      if (histLabels[3]) histLabels[3].textContent = t('filter_tech');
+      if (histLabels[4]) histLabels[4].textContent = t('filter_from');
+      if (histLabels[5]) histLabels[5].textContent = t('filter_to');
+      if (histLabels[6]) histLabels[6].textContent = t('filter_sort');
+      $('#histSearch').placeholder = LANG==='cs' ? 'typ / sériové / název / ticket / díl / technik...' : 'type / serial / title / ticket / part / technician...';
+      const histType = $('#histType'); if (histType) histType.innerHTML = `<option value="ALL">${t('filter_all')}</option><option value="Jiné">${t('form_other')}</option><option value="RS11">RS11</option><option value="P40">P40</option>`;
+      const histStatus = $('#histStatus'); if (histStatus) histStatus.innerHTML = `<option value="ANY">${t('status_any')}</option><option value="BACK">${t('status_back')}</option><option value="OUT">${t('status_out')}</option><option value="NEUTRAL">${t('status_neutral')}</option>`;
+      const histTech = $('#histTech'); if (histTech && histTech.options.length && histTech.value === 'ALL') histTech.options[0].textContent = t('filter_all_tech');
+      const histSort = $('#histSort'); if (histSort) histSort.innerHTML = `<option value="latest">${t('sort_latest')}</option><option value="oldest">${t('sort_oldest')}</option>`;
+      $('#histClear').textContent = t('filter_clear');
+      document.querySelector('#secGate h2').textContent = t('gate_title');
+      document.querySelector('#secGate p.soft').textContent = LANG === 'cs' ? 'Zadej společné heslo portálu. Záznamy a přílohy se načtou z OneDrivu.' : 'Enter the portal password to load records and attachments from OneDrive.';
+      $('#gatePick').textContent = LANG === 'cs' ? 'Přihlásit' : 'Sign in';
+      document.querySelector('#secUdrzba h2').textContent = t('maint_title');
+      document.querySelector('#secUdrzba .section-title .row label.soft').textContent = t('maint_filter');
+      if ($('#maintSearchLabel')) $('#maintSearchLabel').textContent = t('maint_search');
+      if ($('#maintSearch')) $('#maintSearch').placeholder = t('maint_search_ph');
+      if ($('#maintSortLabel')) $('#maintSortLabel').textContent = t('maint_sort_label');
+      const maintSort = $('#maintSort');
+      if (maintSort) maintSort.innerHTML = `<option value="SERIAL">${t('maint_sort_serial')}</option><option value="DATE">${t('maint_sort_date')}</option>`;
+      const maintFilterType = $('#maintFilterType');
+      if (maintFilterType) { const v = maintFilterType.value; maintFilterType.innerHTML = `<option value="ALL">${t('maint_all')}</option><option value="RS11">RS11</option><option value="P40">P40</option>`; maintFilterType.value = v; }
+      // KPI labels
+      if ($('#kpiServLabel')) $('#kpiServLabel').textContent = t('kpi_records');
+      if ($('#statsChartTitle')) $('#statsChartTitle').textContent = t('stats_chart_title');
+      if ($('#spAll')) $('#spAll').textContent = t('stats_period_all')||'Celkem';
+      if ($('#spMonth')) $('#spMonth').textContent = t('stats_period_month')||'Měsíčně';
+      if ($('#spQuarter')) $('#spQuarter').textContent = t('stats_period_quarter')||'Čtvrtletně';
+      if ($('#spYear')) $('#spYear').textContent = t('stats_period_year')||'Ročně';
+      if ($('#statsReliTitle')) $('#statsReliTitle').textContent = t('stats_reli_title');
+      if ($('#thRelRobot')) $('#thRelRobot').textContent = t('stats_col_robot');
+      if ($('#thRelCount')) $('#thRelCount').textContent = t('stats_col_count');
+      if ($('#thRelDays')) $('#thRelDays').textContent = t('stats_col_days');
+      if ($('#thRelFault')) $('#thRelFault').textContent = t('stats_col_fault');
+      if ($('#thRelRel')) $('#thRelRel').textContent = t('stats_col_reli');
+      if ($('#partsSecTitle')) $('#partsSecTitle').textContent = t('parts_title');
+      if ($('#tabListLabel')) $('#tabListLabel').textContent = t('parts_tab_list');
+      if ($('#tabHistLabel')) $('#tabHistLabel').textContent = t('parts_tab_hist');
+      if ($('#thPartName')) $('#thPartName').textContent = t('parts_name');
+      if ($('#thPartNo')) $('#thPartNo').textContent = t('parts_number');
+      if ($('#thPartQty')) $('#thPartQty').textContent = t('parts_qty');
+      if ($('#thPartType')) $('#thPartType').textContent = t('parts_type');
+      if ($('#thPartAdded')) $('#thPartAdded').textContent = t('parts_added');
+      if ($('#thPartUpdated')) $('#thPartUpdated').textContent = t('partslastupdate');
+      if ($('#thPartActions')) $('#thPartActions').textContent = t('parts_actions');
+      if ($('#thPhName')) $('#thPhName').textContent = t('parts_hist_name');
+      if ($('#thPhNo')) $('#thPhNo').textContent = t('parts_hist_no');
+      if ($('#thPhDate')) $('#thPhDate').textContent = t('parts_hist_date');
+      if ($('#thPhTech')) $('#thPhTech').textContent = t('parts_hist_tech');
+      if ($('#thPhQty')) $('#thPhQty').textContent = t('parts_hist_qty');
+      if ($('#thPhSerial')) $('#thPhSerial').textContent = t('parts_hist_serial');
+      if ($('#partsSearch')) $('#partsSearch').placeholder = t('parts_search_ph')||'Hledat díl...';
+      if ($('#kpiOutLabel')) $('#kpiOutLabel').textContent = t('kpi_out');
+      if ($('#kpiPartsLabel')) $('#kpiPartsLabel').textContent = t('kpi_parts');
+      // Form heading: Nový servisní záznam / Upravit servisní záznam
+      const formHeading = document.querySelector('#secServisForm .section-title h2');
+      if (formHeading) formHeading.textContent = editIndex === -1 ? t('form_title_new') : t('form_title_edit');
+      // Externistický technik label (formLabels[12])
+      const allFormLabels = document.querySelectorAll('#secServisForm label');
+      if (allFormLabels[12]) allFormLabels[12].textContent = t('form_ext_tech');
+      // Placeholdery formuláře
+      if ($('#srvTitle'))    $('#srvTitle').placeholder    = t('ph_title');
+      // Multi-select placeholdery
+      if (!selectedTechs.length) updateTechDisplay();
+      if (!selectedSerials.length) updateSerialDisplay();
+      // Přeložit tlačítko přidat díl
+      const addPartBtn = $('#srvAddPart');
+      if (addPartBtn) addPartBtn.textContent = LANG==='cs' ? '+ Přidat díl' : '+ Add part';
+      if ($('#srvPartNo'))   $('#srvPartNo').placeholder   = t('ph_part_catalog');
+      if ($('#srvPartName')) $('#srvPartName').placeholder = t('ph_part_catalog');
+      if ($('#srvDesc'))     $('#srvDesc').placeholder     = t('ph_desc');
+      if ($('#srvExtTech'))  $('#srvExtTech').placeholder  = t('ph_ext_tech');
+      // Složka načtena — aktualizuj jen pokud už je složka vybrána
+      const pickedInfo = $('#pickedInfo');
+      if (pickedInfo && !pickedInfo.classList.contains('soft')) {
+        pickedInfo.textContent = t('folder_loaded');
+      }
+    }
+
+    function populateTechFilter() {
+      const sel = $('#histTech');
+      // r.tech může být pole nebo řetězec — rozložit na jednotlivé jména a deduplikovat
+      const techSet = new Set();
+      servis.forEach(r => {
+        const val = r.tech;
+        if (!val) return;
+        if (Array.isArray(val)) val.forEach(v => { if (v) techSet.add(v.trim()); });
+        else String(val).split(',').forEach(v => { if (v.trim()) techSet.add(v.trim()); });
+      });
+      const techs = Array.from(techSet).sort((a, b) => a.localeCompare(b, 'cs'));
+      sel.innerHTML = `<option value="ALL">${t('filter_all_tech')}</option>` + techs.map(v => `<option value="${v}">${v}</option>`).join('');
+    }
+    function passesHistFilters(r) {
+      const q = ($('#histSearch')?.value||'').toLowerCase();
+      const typeF = $('#histType')?.value || 'ALL';
+      const status = $('#histStatus')?.value || 'ANY';
+      const techF = $('#histTech')?.value || 'ALL';
+      const from = $('#histFrom')?.value;
+      const to = $('#histTo')?.value;
+      function textIn(...arr){ return q ? arr.join(' ').toLowerCase().includes(q) : true; }
+      if (typeF!=='ALL' && (r.type||'')!==typeF) return false;
+      if (status==='BACK' && r.back!==true) return false;
+      if (status==='OUT' && r.back!==false) return false;
+      if (status==='NEUTRAL' && r.back!==null) return false;
+      if (techF !== 'ALL') {
+        // r.tech může být pole nebo řetězec — hledat technika jako jednotlivé jméno
+        const techArr = Array.isArray(r.tech)
+          ? r.tech.map(v => v.trim())
+          : String(r.tech || '').split(',').map(v => v.trim());
+        if (!techArr.includes(techF)) return false;
+      }
+      if (from && (r.date||'') < from) return false;
+      if (to && (r.date||'') > to) return false;
+      if (!textIn(r.type||'', r.serial||'', r.title||'', r.ticket||'', r.partNo||'', r.partName||'', r.tech||'')) return false;
+      return true;
+    }
+    function attachHistFilterEvents() {
+      ['histSearch','histType','histStatus','histTech','histFrom','histTo','histSort'].forEach(id=> {
+        const el = $('#'+id); if (el) el.addEventListener('input', ()=> renderServisList());
+        if (el && el.tagName==='SELECT') el.addEventListener('change', ()=> renderServisList());
+      });
+      $('#histClear')?.addEventListener('click', ()=> {
+        $('#histSearch').value=''; $('#histType').value='ALL'; $('#histStatus').value='ANY'; $('#histTech').value='ALL'; $('#histFrom').value=''; $('#histTo').value=''; $('#histSort').value='DESC'; renderServisList();
+      });
+    }
+
+    // === MULTI-SELECT SERIALS ===
+    let selectedSerials = [];
+
+    function updateSerialDisplay() {
+      const disp = $('#srvSerialDisplay');
+      if (!disp) return;
+      if (!selectedSerials.length) {
+        disp.textContent = LANG==='cs' ? '– vyber –' : '– select –';
+      } else {
+        // Vždy zobrazit konkrétní čísla oddělená čárkou
+        disp.textContent = selectedSerials.join(', ');
+        // Pokud je text příliš dlouhý, zkrátit vizuálně (CSS text-overflow)
+        disp.style.overflow = 'hidden';
+        disp.style.textOverflow = 'ellipsis';
+        disp.style.whiteSpace = 'nowrap';
+        disp.style.maxWidth = 'calc(100% - 20px)';
+      }
+    }
+
+    function renderSerialList(filter) {
+      const type = $('#srvType').value;
+      const src = type==='RS11' ? RS11 : type==='P40' ? P40 : [];
+      const q = (filter||'').toLowerCase();
+      const list = $('#srvSerialList');
+      if (!list) return;
+      list.innerHTML = '';
+      src.filter(s => !q || s.toLowerCase().includes(q)).forEach(s => {
+        const checked = selectedSerials.includes(s);
+        const item = document.createElement('label');
+        item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer;border-radius:7px;user-select:none;';
+        item.onmouseenter = () => item.style.background = 'var(--hover-bg,rgba(255,255,255,.06))';
+        item.onmouseleave = () => item.style.background = '';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = s; cb.checked = checked;
+        cb.style.cssText = 'width:15px;height:15px;accent-color:var(--accent,#3b82f6);cursor:pointer;';
+        cb.addEventListener('change', () => {
+          if (cb.checked) { if (!selectedSerials.includes(s)) selectedSerials.push(s); }
+          else { selectedSerials = selectedSerials.filter(x => x !== s); }
+          updateSerialDisplay();
+          updateStatusButtons();
+        });
+        const span = document.createElement('span');
+        span.textContent = s;
+        span.style.fontSize = '14px';
+        item.appendChild(cb); item.appendChild(span);
+        list.appendChild(item);
+      });
+    }
+
+
+    // === MULTI-SELECT TECHNIK ===
+    let selectedTechs = [];
+
+    function getTechNames() {
+      // Vytáhni techniky z existujících záznamů (stejně jako populateTechFilter)
+      const names = new Set();
+      servis.forEach(r => {
+        const arr = Array.isArray(r.tech) ? r.tech : (r.tech ? String(r.tech).split(',') : []);
+        arr.forEach(n => { const t = n.trim(); if (t) names.add(t); });
+      });
+      // Fallback – statický seznam pokud nejsou žádná data
+      if (!names.size) {
+        ['Ondřej Machač','Michal Prosecký','Lukáš Kubiš','Jan Priesol'].forEach(n => names.add(n));
+      }
+      return [...names].sort((a,b) => a.localeCompare(b, 'cs'));
+    }
+
+    function updateTechDisplay() {
+      const disp = $('#srvTechDisplay');
+      if (!disp) return;
+      if (!selectedTechs.length) {
+        disp.textContent = LANG==='cs' ? '– vyber –' : '– select –';
+      } else {
+        disp.textContent = selectedTechs.join(', ');
+        disp.style.overflow = 'hidden';
+        disp.style.textOverflow = 'ellipsis';
+        disp.style.whiteSpace = 'nowrap';
+        disp.style.maxWidth = 'calc(100% - 20px)';
+      }
+    }
+
+    function renderTechList() {
+      const list = $('#srvTechList');
+      if (!list) return;
+      list.innerHTML = '';
+      getTechNames().forEach(name => {
+        const checked = selectedTechs.includes(name);
+        const item = document.createElement('label');
+        item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer;border-radius:7px;user-select:none;';
+        item.onmouseenter = () => item.style.background = 'var(--hover-bg,rgba(255,255,255,.06))';
+        item.onmouseleave = () => item.style.background = '';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = name; cb.checked = checked;
+        cb.style.cssText = 'width:15px;height:15px;accent-color:var(--accent,#3b82f6);cursor:pointer;';
+        cb.addEventListener('change', () => {
+          if (cb.checked) { if (!selectedTechs.includes(name)) selectedTechs.push(name); }
+          else { selectedTechs = selectedTechs.filter(x => x !== name); }
+          updateTechDisplay();
+        });
+        const span = document.createElement('span');
+        span.textContent = name;
+        span.style.fontSize = '14px';
+        item.appendChild(cb); item.appendChild(span);
+        list.appendChild(item);
+      });
+    }
+
+    function rebuildSerials() {
+      const type = $('#srvType').value;
+      const toggle = $('#srvSerialToggle');
+      selectedSerials = [];
+      if (type === 'RS11' || type === 'P40') {
+        if (toggle) toggle.disabled = false;
+        renderSerialList('');
+      } else {
+        if (toggle) toggle.disabled = true;
+        const list = $('#srvSerialList');
+        if (list) list.innerHTML = '';
+        const dd = $('#srvSerialDropdown');
+        if (dd) dd.classList.add('hidden');
+      }
+      updateSerialDisplay();
+      updateStatusButtons();
+      // Obnov filtrování dílů dle nového typu robota
+      refreshPartSelects();
+    }
+
+    function populatePartSelect() {
+      // Obnoví katalogové selecty v dynamických řádcích dílů
+      resetPartRows();
+    }
+
+
+    // ═══════════════════════════════════════════
+    // MULTI-DÍLY – dynamické řádky ve formuláři
+    // ═══════════════════════════════════════════
+    let partRows = [];  // [{ catalogIdx: -1, partNo: '', partName: '' }, ...]
+
+
+    function refreshPartSelects() {
+      // Obnov všechny katalogové selecty v řádcích dílů po změně typu robota
+      const container = $('#srvPartsContainer');
+      if (!container) return;
+      container.querySelectorAll('.part-catalog-sel').forEach((sel, i) => {
+        const row = partRows[i];
+        const searchInput = sel.closest('[data-part-idx]')?.querySelector('input[type="text"]');
+        const q = searchInput ? searchInput.value : '';
+        fillPartSelect(sel, q, row ? row.catalogIdx : -1);
+      });
+    }
+    function getFilteredParts() {
+      // Vrať díly filtrované podle aktuálně vybraného typu robota
+      const type = $('#srvType') ? $('#srvType').value : '';
+      if (!type || type === 'Jiné' || type === '') return dily.map((p, i) => ({ p, i }));
+      return dily.map((p, i) => ({ p, i })).filter(({ p }) =>
+        !p.robotType || p.robotType === type || p.robotType === 'Jiné' || p.robotType === ''
+      );
+    }
+
+    function fillPartSelect(sel, searchVal, selectedIdx) {
+      // Naplní select díly filtrovanými dle typu + vyhledávání
+      const filtered = getFilteredParts();
+      const q = (searchVal || '').toLowerCase();
+      sel.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '-1';
+      placeholder.textContent = LANG==='cs' ? '— vyber z katalogu —' : '— select from catalog —';
+      sel.appendChild(placeholder);
+
+      if (filtered.length === 0) {
+        const noItems = document.createElement('option');
+        noItems.disabled = true;
+        noItems.textContent = LANG==='cs' ? '(nejprve vyber typ robota)' : '(select robot type first)';
+        sel.appendChild(noItems);
+        return;
+      }
+
+      const type = $('#srvType') ? $('#srvType').value : '';
+      if (!type) {
+        const hint = document.createElement('option');
+        hint.disabled = true;
+        hint.textContent = LANG==='cs' ? '(nejprve vyber typ robota)' : '(select robot type first)';
+        sel.appendChild(hint);
+      }
+
+      filtered.filter(({ p }) => !q ||
+        (p.number||'').toLowerCase().includes(q) ||
+        (p.name||'').toLowerCase().includes(q)
+      ).forEach(({ p, i }) => {
+        const label = `${p.number||'–'} – ${p.name||'–'}${Number.isFinite(p.qty) ? ' ('+p.qty+' '+t('parts_unit')+')' : ''}`;
+        const o = document.createElement('option'); o.value = String(i); o.textContent = label; sel.appendChild(o);
+      });
+
+      // Obnov vybranou hodnotu pokud stále existuje
+      if (selectedIdx >= 0) sel.value = String(selectedIdx);
+      if (sel.value !== String(selectedIdx)) sel.value = '-1';
+    }
+
+    function createPartRow(rowData) {
+      // rowData = { catalogIdx, partNo, partName } nebo {} pro prázdný řádek
+      const idx = partRows.length;
+      const row = { catalogIdx: rowData.catalogIdx ?? -1, partNo: rowData.partNo || '', partName: rowData.partName || '' };
+      partRows.push(row);
+
+      const wrap = document.createElement('div');
+      wrap.dataset.partIdx = idx;
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:var(--surface,rgba(255,255,255,.03));border:1px solid var(--border);border-radius:10px;';
+
+      // Horní řádek: search + select + tlačítko odebrat
+      const topRow = document.createElement('div');
+      topRow.style.cssText = 'display:grid;grid-template-columns:160px 1fr auto;gap:8px;align-items:end;';
+
+      // Vyhledávání v katalogu
+      const searchWrap = document.createElement('div');
+      if (idx === 0) {
+        const searchLabel = document.createElement('label');
+        searchLabel.textContent = LANG==='cs' ? 'Hledat díl' : 'Search part';
+        searchLabel.style.fontSize = '13px';
+        searchWrap.appendChild(searchLabel);
+      }
+      const searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.placeholder = LANG==='cs' ? 'hledat...' : 'search...';
+      searchInput.style.cssText = 'padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg,var(--surface));font-size:13px;width:100%;';
+      searchWrap.appendChild(searchInput);
+
+      // Díl z katalogu select
+      const selWrap = document.createElement('div');
+      if (idx === 0) {
+        const selLabel = document.createElement('label');
+        selLabel.dataset.i18n = 'form_part_from_catalog';
+        selLabel.textContent = LANG==='cs' ? 'Díl z katalogu' : 'Part from catalog';
+        selLabel.style.fontSize = '13px';
+        selWrap.appendChild(selLabel);
+      }
+      const sel = document.createElement('select');
+      sel.className = 'part-catalog-sel';
+      fillPartSelect(sel, '', row.catalogIdx);
+      selWrap.appendChild(sel);
+
+      // Tlačítko odebrat
+      const removeWrap = document.createElement('div');
+      if (idx === 0) {
+        // spacer pro alignment s labelem
+        const spacer = document.createElement('div'); spacer.style.height = '22px'; removeWrap.appendChild(spacer);
+      }
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.title = LANG==='cs' ? 'Odebrat díl' : 'Remove part';
+      removeBtn.style.cssText = 'width:32px;height:32px;border-radius:50%;background:var(--danger,#e05252);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+      removeBtn.addEventListener('click', () => removePartRow(idx));
+      removeWrap.appendChild(removeBtn);
+
+      topRow.appendChild(searchWrap); topRow.appendChild(selWrap); topRow.appendChild(removeWrap);
+
+      // Dolní řádek: Číslo dílu | Název dílu
+      const bottomRow = document.createElement('div');
+      bottomRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+
+      // Číslo dílu
+      const noWrap = document.createElement('div');
+      const noLabel = document.createElement('label');
+      noLabel.dataset.i18n = 'form_part_no';
+      noLabel.textContent = LANG==='cs' ? 'Číslo dílu' : 'Part number';
+      noLabel.style.fontSize = '13px';
+      const noInput = document.createElement('input');
+      noInput.type = 'text'; noInput.value = row.partNo;
+      noInput.placeholder = t('ph_part_catalog') || '';
+      noInput.addEventListener('input', () => { row.partNo = noInput.value; row.catalogIdx = -1; sel.value = '-1'; });
+      noWrap.appendChild(noLabel); noWrap.appendChild(noInput);
+
+      // Název dílu
+      const nameWrap = document.createElement('div');
+      const nameLabel = document.createElement('label');
+      nameLabel.dataset.i18n = 'form_part_name';
+      nameLabel.textContent = LANG==='cs' ? 'Název dílu' : 'Part name';
+      nameLabel.style.fontSize = '13px';
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text'; nameInput.value = row.partName;
+      nameInput.placeholder = t('ph_part_catalog') || '';
+      nameInput.addEventListener('input', () => { row.partName = nameInput.value; row.catalogIdx = -1; sel.value = '-1'; });
+      nameWrap.appendChild(nameLabel); nameWrap.appendChild(nameInput);
+
+      bottomRow.appendChild(noWrap); bottomRow.appendChild(nameWrap);
+
+      // Napoj select → vstupy
+      sel.addEventListener('change', () => {
+        const i = Number(sel.value);
+        row.catalogIdx = i;
+        if (i >= 0 && i < dily.length) {
+          row.partNo = dily[i].number || '';
+          row.partName = dily[i].name || '';
+          noInput.value = row.partNo;
+          nameInput.value = row.partName;
+        } else {
+          row.partNo = noInput.value;
+          row.partName = nameInput.value;
+        }
+      });
+
+      // Search input filtruje select
+      searchInput.addEventListener('input', () => {
+        fillPartSelect(sel, searchInput.value, row.catalogIdx);
+      });
+
+      wrap.appendChild(topRow); wrap.appendChild(bottomRow);
+
+      const container = $('#srvPartsContainer');
+      if (container) container.appendChild(wrap);
+
+      refreshRemoveButtons();
+      return wrap;
+    }
+
+    function removePartRow(idx) {
+      partRows.splice(idx, 1);
+      renderAllPartRows();
+    }
+
+    function renderAllPartRows() {
+      const container = $('#srvPartsContainer');
+      if (!container) return;
+      const saved = partRows.slice(); // záloha
+      partRows = [];
+      container.innerHTML = '';
+      saved.forEach(r => createPartRow(r));
+      refreshRemoveButtons();
+    }
+
+    function refreshRemoveButtons() {
+      const container = $('#srvPartsContainer');
+      if (!container) return;
+      const rows = container.querySelectorAll('[data-part-idx]');
+      rows.forEach((row, i) => {
+        const btn = row.querySelector('button');
+        if (btn) btn.style.visibility = rows.length <= 1 ? 'hidden' : 'visible';
+      });
+    }
+
+    function resetPartRows() {
+      partRows = [];
+      const container = $('#srvPartsContainer');
+      if (container) container.innerHTML = '';
+      createPartRow({});   // vždy jeden prázdný řádek
+      // Aktualizuj "Přidat díl" tlačítko text dle jazyka
+      const addBtn = $('#srvAddPart');
+      if (addBtn) addBtn.textContent = LANG==='cs' ? '+ Přidat díl' : '+ Add part';
+    }
+
+    // Získej pole dílů z formuláře (pro uložení do záznamu)
+    function getPartsList() {
+      return partRows
+        .filter(r => (Array.isArray(r.parts) && r.parts.some(p => p.partNo||p.partName)) || r.partNo || r.partName)
+        .map(r => ({ catalogIdx: r.catalogIdx, partNo: r.partNo.trim(), partName: r.partName.trim() }));
+    }
+
+    // Načti díly ze záznamu do formuláře (pro editaci)
+    function loadPartsFromRecord(r) {
+      partRows = [];
+      const container = $('#srvPartsContainer');
+      if (container) container.innerHTML = '';
+      // Starý formát: r.partNo / r.partName (jeden díl)
+      // Nový formát: r.parts (pole objektů { partNo, partName })
+      let list = [];
+      if (Array.isArray(r.parts) && r.parts.length > 0 && typeof r.parts[0] === 'object' && 'partNo' in r.parts[0]) {
+        list = r.parts;
+      } else if (r.partNo || r.partName) {
+        list = [{ partNo: r.partNo || '', partName: r.partName || '', catalogIdx: -1 }];
+      }
+      if (list.length === 0) list = [{}];
+      list.forEach(p => createPartRow(p));
+    }
+
+    async function renderPickedPreviews() {
+      const box = $('#srvPhotoPreview'); box.innerHTML = '';
+      for (let i = 0; i < photoHandles.length; i++) {
+        const h = photoHandles[i];
+        const f = await h.getFile(); const url = URL.createObjectURL(f);
+        const wrap = document.createElement('div'); wrap.className = 'thumb-wrap';
+        const img = document.createElement('img'); img.src = url; img.title = f.name;
+        img.addEventListener('click', ()=> window.open(url, '_blank'));
+        const btn = document.createElement('button'); btn.className = 'thumb-remove'; btn.innerHTML = '&times;'; btn.title = LANG==='cs'?'Odebrat':'Remove';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          photoHandles.splice(i, 1);
+          $('#srvPhotoCount').textContent = filesCountStr(photoHandles.length);
+          renderPickedPreviews();
+        });
+        wrap.appendChild(img); wrap.appendChild(btn); box.appendChild(wrap);
+      }
+    }
+
+    function renderPickedFiles() {
+      const box = $('#srvFileList'); box.innerHTML = '';
+      for (let i = 0; i < fileHandles.length; i++) {
+        const h = fileHandles[i];
+        h.getFile().then(f => {
+          const chip = document.createElement('div'); chip.className = 'file-chip';
+          const span = document.createElement('span'); span.textContent = f.name; span.title = f.name;
+          const btn = document.createElement('button'); btn.innerHTML = '&times;'; btn.title = LANG==='cs'?'Odebrat':'Remove';
+          btn.addEventListener('click', () => {
+            fileHandles.splice(i, 1);
+            $('#srvFileCount').textContent = filesCountStr(fileHandles.length);
+            renderPickedFiles();
+          });
+          chip.appendChild(span); chip.appendChild(btn); box.appendChild(chip);
+        });
+      }
+    }
+
+
+    // Bezpečný helper pro počet souborů (files_count může být funkce nebo string)
+    function filesCountStr(n) {
+      const fc = t('files_count');
+      if (typeof fc === 'function') return fc(n);
+      return LANG === 'cs' ? `${n} souborů` : `${n} files`;
+    }
+    function validateServisForm() {
+      ['srvType','srvDate','srvTime','srvTitle','srvDesc'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.parentElement.classList.remove('field-error');
+      });
+      const missing=[];
+      const type=$('#srvType').value;
+      if(!type){missing.push(LANG==='cs'?'Typ robota':'Robot type');$('#srvType').parentElement.classList.add('field-error');}
+      if((type==='RS11'||type==='P40')&&!selectedSerials.length){missing.push(LANG==='cs'?'Sériové číslo (vyberte alespoň jedno)':'Serial number (select at least one)');$('#srvSerialWrap').classList.add('field-error');}
+      if(!$('#srvDate').value){missing.push(LANG==='cs'?'Datum':'Date');$('#srvDate').parentElement.classList.add('field-error');}
+      if(!$('#srvTime').value){missing.push(LANG==='cs'?'Čas':'Time');$('#srvTime').parentElement.classList.add('field-error');}
+      if(!$('#srvTitle').value.trim()){missing.push(LANG==='cs'?'Nadpis úkonu':'Task title');$('#srvTitle').parentElement.classList.add('field-error');}
+      if(!$('#srvDesc').value.trim()){missing.push(LANG==='cs'?'Popis práce':'Work description');$('#srvDesc').parentElement.classList.add('field-error');}
+      if(!selectedTechs.length){missing.push(LANG==='cs'?'Technik':'Technician');const tw=$('#srvTechMultiWrap');if(tw)tw.classList.add('field-error');}
+      if(missing.length) return (LANG==='cs'?'Chybí vyplnit: ':'Missing: ')+missing.join(', ');
+      return '';
+    }
+
+    function resetFormOnlyPhotos() {
+      photoHandles=[]; $('#srvPhotoPreview').innerHTML=''; $('#srvPhotoCount').textContent=filesCountStr(0);
+      fileHandles=[]; $('#srvFileCount').textContent=filesCountStr(0); $('#srvFileList').innerHTML='';
+      const _nn = niceNow(); $('#srvDate').value=_nn.date; $('#srvTime').value=_nn.time;
+      $('#srvType').value='Jiné';
+      $('#srvFolder').value='';
+      $('#srvTitle').value = ''; $('#srvTicket').value='';
+      $('#srvTicketLink').value='';
+      $('#srvDesc').value='';
+      selectedTechs = []; renderTechList(); updateTechDisplay();
+      editIndex = -1;
+      rebuildSerials();
+      resetPartRows();
+      const extTechEl = document.getElementById('srvExtTech');
+      if (extTechEl) extTechEl.value = '';
+      srvStatus = 'none'; $('#srvMarkOut').classList.remove('primary'); $('#srvMarkBack').classList.remove('primary');
+      $('#srvSave').textContent = t('form_save'); $('#srvCancelEdit').classList.add('hidden');
+      updateStatusButtons();
+    }
+
+    async function saveServisRecordCloud() {
+      if (!dataDir) return alert(t('alert_choose_data'));
+      const err = validateServisForm(); if (err) return alert(err);
+
+      const type = $('#srvType').value;
+      // Pro každé vybrané sériové číslo uložíme samostatný záznam.
+      const serialList = (type==='RS11'||type==='P40') ? [...selectedSerials] : [''];
+
+      const date = $('#srvDate').value;
+      const time = $('#srvTime').value;
+      const backVal = (srvStatus==='back'? true : (srvStatus==='out'? false : null));
+
+      const baseFields = {
+        type,
+        date, time,
+        title: $('#srvTitle').value.trim(),
+        ticket: $('#srvTicket').value.trim(),
+        ticketLink: ($('#srvTicketLink')||{value:''}).value.trim(),
+        parts: getPartsList(),  // pole { catalogIdx, partNo, partName }
+        desc: $('#srvDesc').value.trim(),
+        back: backVal,
+        tech: [...selectedTechs],
+        extTech: ($('#srvExtTech')||{value:''}).value.trim()
+      };
+
+      // Odpočet dílů ze skladu – všechny řádky, jednou bez ohledu na počet serialů
+      const partsList = getPartsList();
+      let anyStockIssue = false;
+      for (const p of partsList) {
+        const idx = p.catalogIdx;
+        if (Number.isFinite(idx) && idx >= 0 && idx < dily.length) {
+          if ((dily[idx].qty || 0) > 0) {
+            dily[idx].qty = (dily[idx].qty || 0) - 1;
+            dily[idx].updatedDate = (new Date()).toISOString().slice(0, 10);
+          } else {
+            anyStockIssue = true;
+          }
+        }
+      }
+      if (anyStockIssue) alert(t('alert_no_stock'));
+      if (partsList.some(p => Number.isFinite(p.catalogIdx) && p.catalogIdx >= 0)) {
+        await persistParts();
+      }
+
+      // První upravený záznam zachová původní složku; další mají vlastní kopie příloh.
+      const firstSerial = serialList[0];
+      const stamp = date.replaceAll('-','') + '_' + time.replace(':','');
+
+      if (editIndex !== -1) {
+        // ── EDITACE – záznam pro každého vybraného robota ───────────────────────
+        let folder = $('#srvFolder').value;
+        const dir = await dataDir.getDirectoryHandle(folder, {create:true});
+        const newPhotoNames = []; const newFileNames = [];
+        for (const h of photoHandles) {
+          const f = await h.getFile(); const name = crypto.randomUUID() + "_" + f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newPhotoNames.push(name);
+        }
+        for (const h of fileHandles) {
+          const f = await h.getFile(); const name = crypto.randomUUID() + "_" + f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newFileNames.push(name);
+        }
+        const existing = servis[editIndex];
+        const updated = {
+          ...existing, ...baseFields,
+          serial: firstSerial,
+          id: folder,
+          photos: [...(existing.photos||[]), ...newPhotoNames],
+          files: [...(existing.files||[]), ...newFileNames]
+        };
+        const editedRecords = [updated];
+        for (const serial of serialList.slice(1)) {
+          const copyFolder = `SERV_${type}_${serial || 'NA'}_${stamp}_${crypto.randomUUID()}`;
+          const copyDir = await dataDir.getDirectoryHandle(copyFolder, {create:true});
+          for (const name of new Set([...updated.photos, ...updated.files])) {
+            const sourceHandle = await dir.getFileHandle(name);
+            const file = await sourceHandle.getFile();
+            const targetHandle = await copyDir.getFileHandle(name, {create:true});
+            const writer = await targetHandle.createWritable();
+            await writer.write(await file.arrayBuffer());
+            await writer.close();
+          }
+          editedRecords.push({...updated, serial, id: copyFolder});
+        }
+        // Nahradíme pouze upravovaný záznam až po úspěšném kopírování příloh.
+        servis.splice(editIndex, 1, ...editedRecords);
+        await writeJSON('servisni.json', servis);
+        const n = niceNow(); $('#srvDate').value = n.date; $('#srvTime').value = n.time;
+        resetFormOnlyPhotos(); renderServisList(); renderMaintenance(); refreshKPIs();
+        alert(t('alert_updated'));
+        goto('secServisHist');
+        return;
+      }
+
+      // ── NOVÝ ZÁZNAM – jeden nebo více serialů ──────────────────────────────────
+      // Soubory/fotky zapíšeme pro každý serial zvlášť (kopie do každé složky)
+      for (let si = 0; si < serialList.length; si++) {
+        const serial = serialList[si];
+        const folder = `SERV_${type}_${serial || 'NA'}_${stamp}_${crypto.randomUUID()}`;
+        await dataDir.getDirectoryHandle(folder, {create:true});
+        const dir = await dataDir.getDirectoryHandle(folder, {create:true});
+
+        const newPhotoNames = []; const newFileNames = [];
+        for (const h of photoHandles) {
+          const f = await h.getFile(); const name = crypto.randomUUID() + "_" + f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newPhotoNames.push(name);
+        }
+        for (const h of fileHandles) {
+          const f = await h.getFile(); const name = crypto.randomUUID() + "_" + f.name;
+          const outHandle = await dir.getFileHandle(name, {create:true});
+          const w = await outHandle.createWritable(); await w.write(await f.arrayBuffer()); await w.close();
+          newFileNames.push(name);
+        }
+
+        const record = {
+          ...baseFields,
+          serial,
+          id: folder,
+          photos: newPhotoNames,
+          files: newFileNames
+        };
+        servis.unshift(record);
+      }
+
+      await writeJSON('servisni.json', servis);
+      const n = niceNow(); $('#srvDate').value = n.date; $('#srvTime').value = n.time;
+      resetFormOnlyPhotos(); renderServisList(); renderMaintenance(); refreshKPIs();
+      const count = serialList.length;
+      alert(count > 1
+        ? (LANG==='cs' ? `Uloženo ${count} záznamů (${serialList.join(', ')})` : `Saved ${count} records (${serialList.join(', ')})`)
+        : t('alert_saved'));
+      goto('secServisHist');
+    }
+
+    function startEdit(idx) {
+      const r = servis[idx];
+      editIndex = idx; goto('secServisForm');
+      $('#srvSave').textContent = t('form_save_changes'); $('#srvCancelEdit').classList.remove('hidden');
+      $('#srvType').value = r.type || 'Jiné'; rebuildSerials();
+      if (r.serial) { selectedSerials = [r.serial]; renderSerialList(''); updateSerialDisplay(); }
+      $('#srvDate').value = r.date || ''; $('#srvTime').value = r.time || '';
+      $('#srvTitle').value = r.title || ''; $('#srvTicket').value = r.ticket || ''; $('#srvTicketLink').value = r.ticketLink || ''; if($('#srvExtTech')) $('#srvExtTech').value = r.extTech || '';
+      loadPartsFromRecord(r);
+      $('#srvDesc').value = r.desc || '';
+      // Načti techniky do multi-select
+      selectedTechs = Array.isArray(r.tech) ? [...r.tech] : (r.tech ? String(r.tech).split(',').map(s=>s.trim()).filter(Boolean) : []);
+      renderTechList(); updateTechDisplay();
+      $('#srvFolder').value = r.id || '';
+      srvStatus = (r.back===true)?'back':(r.back===false?'out':'none');
+      $('#srvMarkBack').classList.toggle('primary', srvStatus==='back');
+      $('#srvMarkOut').classList.toggle('primary', srvStatus==='out');
+      photoHandles=[]; fileHandles=[]; $('#srvPhotoPreview').innerHTML=''; $('#srvPhotoCount').textContent=filesCountStr(0); $('#srvFileCount').textContent=filesCountStr(0); $('#srvFileList').innerHTML='';
+      window.scrollTo({top:0, behavior:'smooth'});
+      updateStatusButtons();
+    }
+
+    function cancelEdit() { resetFormOnlyPhotos(); }
+
+    async function deleteRecord(idx) {
+      const r = servis[idx];
+      const pw = prompt(t('del_record_confirm'));
+      if (pw === null) return;
+      if (pw !== 'geekminus') { alert(t('del_wrong_pw')); return; }
+      servis.splice(idx, 1); await writeJSON('servisni.json', servis);
+      try { await dataDir.removeEntry(r.id, {recursive:true}); } catch(e) { console.warn('removeEntry selhalo / složka nenalezena', e); }
+      renderServisList(); renderMaintenance(); refreshKPIs();
+    }
+
+    
+    function daysSince(dateStr) {
+      if (!dateStr) return null;
+      const start = new Date(dateStr + 'T00:00:00');
+      if (Number.isNaN(start.getTime())) return null;
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return Math.max(0, Math.floor((today - start) / 86400000));
+    }
+    function daysBadge(days) {
+      if (days == null) return '';
+      const cls = days >= 8 ? 'days-badge days-bad' : days >= 4 ? 'days-badge days-warn' : 'days-badge days-good';
+      return `<span class="${cls}">${days} ${LANG==='cs' ? (days===1 ? 'den' : (days>=2 && days<=4 ? 'dny' : 'dní')) : (days===1 ? 'day' : 'days')}</span>`;
+    }
+    let histSortState = { key: 'date', dir: 'desc' };
+    function sortArrow(key) {
+      if (histSortState.key !== key) return '▲▼';
+      return histSortState.dir === 'asc' ? '↑' : '↓';
+    }
+    function sortActive(key) { return histSortState.key === key ? 'active' : ''; }
+    function setHistSort(key) {
+      if (histSortState.key === key) histSortState.dir = histSortState.dir === 'asc' ? 'desc' : 'asc';
+      else histSortState = { key, dir: key === 'date' ? 'desc' : 'asc' };
+      renderServisList();
+    }
+
+    
+function renderServisList() {
+      $('#srvCount').textContent = `${servis.length} záznamů`;
+      const list = $('#srvList'); list.innerHTML = '';
+      let rows = servis.slice().filter(passesHistFilters);
+
+      rows = rows.map(r => ({ ...r, _days: r.back===false ? daysSince(r.date) : null }));
+
+      rows.sort((a,b)=> {
+        const dir = histSortState.dir === 'asc' ? 1 : -1;
+        if (histSortState.key === 'robot') {
+          const av = `${a.type||''} ${a.serial||''}`.trim().toLowerCase();
+          const bv = `${b.type||''} ${b.serial||''}`.trim().toLowerCase();
+          return av > bv ? dir : av < bv ? -dir : 0;
+        }
+        if (histSortState.key === 'title') {
+          const av = (a.title||'').toLowerCase();
+          const bv = (b.title||'').toLowerCase();
+          return av > bv ? dir : av < bv ? -dir : 0;
+        }
+        if (histSortState.key === 'days') {
+          const av = a._days == null ? -1 : a._days;
+          const bv = b._days == null ? -1 : b._days;
+          return (av - bv) * dir;
+        }
+        if (histSortState.key === 'status') {
+          const rank = v => v===false ? 2 : v===true ? 1 : 0;
+          return (rank(a.back) - rank(b.back)) * dir;
+        }
+        const ad = (a.date||'') + ' ' + (a.time||'');
+        const bd = (b.date||'') + ' ' + (b.time||'');
+        return ad > bd ? dir : ad < bd ? -dir : 0;
+      });
+
+      const sortBar = document.createElement('div');
+      sortBar.className = 'card no-print';
+      sortBar.style.marginBottom = '12px';
+      sortBar.innerHTML = `
+        <div class="row" style="gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="btn sort-head ${sortActive('robot')}" data-sort="robot"><span>${t('sort_robot')}</span><span class="arr">${sortArrow('robot')}</span></button>
+          <button class="btn sort-head ${sortActive('title')}" data-sort="title"><span>${t('sort_title')}</span><span class="arr">${sortArrow('title')}</span></button>
+          <button class="btn sort-head ${sortActive('date')}" data-sort="date"><span>${t('sort_date')}</span><span class="arr">${sortArrow('date')}</span></button>
+          <button class="btn sort-head ${sortActive('days')}" data-sort="days"><span>${t('sort_days')}</span><span class="arr">${sortArrow('days')}</span></button>
+          <button class="btn sort-head ${sortActive('status')}" data-sort="status"><span>${t('sort_status')}</span><span class="arr">${sortArrow('status')}</span></button>
+        </div>`;
+      list.appendChild(sortBar);
+      sortBar.querySelectorAll('[data-sort]').forEach(btn => btn.addEventListener('click', ()=> setHistSort(btn.dataset.sort)));
+
+      rows.forEach((r) => {
+        const idx = servis.findIndex(x => x.id === r.id);
+        const item = document.createElement('div'); item.className = 'hist-item';
+        const head = document.createElement('div'); head.className = 'hist-head';
+        head.innerHTML = `
+          <div class="hist-title"><span class="pill">${r.type}${r.serial ? ' · ' + r.serial : ''}</span> ${r.title || '(bez názvu)'}</div>
+          <div class="hist-meta">
+            <span class="soft">${r.date} ${r.time}</span>
+            ${r.back===false ? daysBadge(r._days) : ''}
+            ${r.back===true ? '<span class="tag">'+t('tag_returned')+'</span>' : (r.back===false ? '<span class="tag" style="background:#2a1620;border-color:#4b2732;color:#fecaca;">'+t('tag_out')+'</span>' : '')}
+          </div>`;
+        const body = document.createElement('div'); body.className = 'hidden';
+
+        const actions = document.createElement('div'); actions.className = 'row no-print';
+        const btnEdit = document.createElement('button'); btnEdit.className = 'btn'; btnEdit.textContent = t('btn_edit'); btnEdit.addEventListener('click', (e)=>{ e.stopPropagation(); startEdit(idx); });
+        const btnDel = document.createElement('button'); btnDel.className = 'btn danger'; btnDel.textContent = t('btn_delete'); btnDel.addEventListener('click', async (e)=>{ e.stopPropagation(); await deleteRecord(idx); });
+        actions.appendChild(btnEdit); actions.appendChild(btnDel);
+
+        const photoCount = (r.photos||[]).length;
+        const photosBtn = document.createElement('button'); photosBtn.className = 'btn no-print'; photosBtn.textContent = t('photos_show') + (photoCount?` (${photoCount})`:'');
+        const photosWrap = document.createElement('div'); photosWrap.className = 'thumbs'; photosWrap.style.marginTop = '8px';
+        if (!photoCount) photosBtn.style.display='none';
+
+        const fileCount = (r.files||[]).length;
+        const filesBtn = document.createElement('button'); filesBtn.className = 'btn no-print'; filesBtn.textContent = t('files_show') + (fileCount?` (${fileCount})`:'');
+        const filesWrap = document.createElement('div'); filesWrap.style.marginTop = '8px';
+        if (!fileCount) filesBtn.style.display='none';
+
+        head.addEventListener('click', () => body.classList.toggle('hidden'));
+
+        photosBtn.addEventListener('click', async () => {
+          photosWrap.innerHTML = '';
+          try {
+            const dir = await dataDir.getDirectoryHandle(r.id);
+            for (const name of (r.photos || [])) {
+              const fH = await dir.getFileHandle(name); const f = await fH.getFile();
+              const url = URL.createObjectURL(f);
+              const img = document.createElement('img'); img.src = url; img.title = name;
+              img.addEventListener('click', ()=> window.open(url, '_blank')); photosWrap.appendChild(img);
+            }
+          } catch(e) { photosWrap.innerHTML = '<span class="soft">Žádné fotky nebo složka nenalezena.</span>'; }
+        });
+
+        filesBtn.addEventListener('click', async ()=>{
+          filesWrap.innerHTML='';
+          try {
+            const dir = await dataDir.getDirectoryHandle(r.id);
+            for (const name of (r.files||[])){
+              const fH = await dir.getFileHandle(name); const f = await fH.getFile();
+              const url = URL.createObjectURL(f);
+              const a = document.createElement('a'); a.href = url; a.download = name; a.textContent = name; a.style.display='inline-block'; a.style.marginRight='12px';
+              filesWrap.appendChild(a);
+            }
+          } catch(e){ filesWrap.innerHTML = '<span class="soft">Soubory nenalezeny.</span>'; }
+        });
+
+        const meta = document.createElement('div'); meta.innerHTML = `
+          <div class="divider"></div>
+          <div class="grid">
+            <div class="ticket-row" style="display:flex;gap:8px;align-items:center;"><b>Ticket:</b> <span>${r.ticket || '<span class="soft">—</span>'}</span>${r.ticketLink ? `<a class="ticket-link-icon" href="${r.ticketLink}" target="_blank" rel="noopener noreferrer" title="Otevřít Geek ticket" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;border:1px solid var(--border);background:var(--btn-bg);color:var(--accent);text-decoration:none;flex-shrink:0;"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg></a>` : ''}</div>
+            <div><b>${LANG==='cs'?'Díly':'Parts'}:</b> ${
+            (() => {
+              // Nový formát: r.parts = [{ partNo, partName }, ...]
+              if (Array.isArray(r.parts) && r.parts.length > 0 && typeof r.parts[0] === 'object' && 'partNo' in r.parts[0]) {
+                const filled = r.parts.filter(p => p.partNo || p.partName);
+                return filled.length > 0
+                  ? filled.map(p => `<span class="chip">${p.partNo ? p.partNo + (p.partName ? ' – ' + p.partName : '') : p.partName}</span>`).join(' ')
+                  : '<span class="soft">—</span>';
+              }
+              // Starý formát
+              return r.partNo ? `<span class="chip">${r.partNo}${r.partName ? ' – ' + r.partName : ''}</span>` : '<span class="soft">—</span>';
+            })()
+          }</div>
+            <div><b>Technik:</b> ${(() => { const a = Array.isArray(r.tech) ? r.tech : (r.tech ? [r.tech] : []); const ext = r.extTech ? ['<em>'+r.extTech+'</em>'] : []; const all = [...a, ...ext].filter(Boolean); return all.length ? all.join(', ') : '<span class="soft">—</span>'; })()}</div>
+            <div class="soft">Složka: ${r.id}</div>
+          </div>
+          <div class="divider"></div>
+          <div>${(r.desc || '').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\n','<br>')}</div>
+        `;
+
+        body.appendChild(actions); body.appendChild(meta);
+        if (photoCount){ body.appendChild(photosBtn); body.appendChild(photosWrap); }
+        if (fileCount){ body.appendChild(filesBtn); body.appendChild(filesWrap); }
+        item.appendChild(head); item.appendChild(body); list.appendChild(item);
+      });
+    }
+
+function exportCSV() {
+      const rows = rowsForExport();
+      if (!rows.length){ alert(LANG==='cs'?'Není co exportovat.':'Nothing to export.'); return; }
+      const headers = t('csv_headers');
+      const yes = LANG==='cs' ? 'Ano' : 'Yes';
+      const no = LANG==='cs' ? 'Ne' : 'No';
+      const esc = (v) => '"' + String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ') + '"';
+      const lines = [headers.map(esc).join(';')];
+      rows.forEach((r) => {
+        const usedParts = formatUsedParts(r);
+        const row = [r.date||'', r.time||'', r.type||'', r.serial||'', r.title||'', r.ticket||'', usedParts||'', r.tech||'', (r.back===false)?yes:no, (r.back===true)?yes:no, r.desc||''];
+        lines.push(row.map(esc).join(';'));
+      });
+      const ts = new Date().toISOString().slice(0,10);
+      const blob = new Blob(['\ufeff' + lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `servisni_historie_${ts}.csv`; a.click(); setTimeout(()=> URL.revokeObjectURL(url), 0);
+    }
+function normalizeTS(r) {
+  return (r.date || "") + " " + (r.time || "");
+}
+
+function getLatestMaintenanceState(serial) {
+  const rows = [...servis]
+    .filter(r => r.serial === serial)
+    .sort((a, b) => normalizeTS(b).localeCompare(normalizeTS(a)));
+
+  for (const r of rows) {
+    if (r.back === true || r.back === false) return r;
+  }
+  return null;
+}
+function getMaintenanceEpisode(serial) {
+  // Seřadit od nejnovějšího po nejstarší
+  const rows = [...servis]
+    .filter(r => r.serial === serial)
+    .sort(sortNewestFirst);
+
+  // Najdi index nejnovějšího záznamu "Dán do údržby" (back === false)
+  const startIndex = rows.findIndex(r => r.back === false);
+  if (startIndex === -1) return [];
+
+  // Vezmi vše od nejnovějšího záznamu až po back===false včetně
+  // (slice(0, startIndex+1) = od indexu 0 do startIndex včetně)
+  return rows.slice(0, startIndex + 1);
+}    
+function tsKey(r) {
+  return `${r.date || ""} ${r.time || ""}`;
+}
+
+function sortNewestFirst(a, b) {
+  return tsKey(b).localeCompare(tsKey(a));
+}    
+function getActiveMaintenanceSerials() {
+  // Pro každý serial najdi POSLEDNÍ záznam kde back !== null (ignorujeme neutrální záznamy)
+  // Robot je aktivně mimo provoz pouze pokud jeho POSLEDNÍ relevantní stav je back===false
+  const latest = new Map();
+  const rows = [...servis]
+    .filter(r => (r.type === "RS11" || r.type === "P40") && r.serial && r.back !== null && r.back !== undefined)
+    .sort(sortNewestFirst);
+
+  for (const r of rows) {
+    if (latest.has(r.serial)) continue; // již máme nejnovější relevantní stav
+    if (r.back === false) latest.set(r.serial, r);       // mimo provoz
+    else latest.set(r.serial, null);                     // back===true => vrácen, přeskočit
+  }
+
+  // Odfiltruj null (vrácení roboti)
+  latest.forEach((v, k) => { if (v === null) latest.delete(k); });
+  return latest;
+}    
+function computeOutOfServiceDetail() {
+  const active = getActiveMaintenanceSerials();
+  const out = { RS11: [], P40: [] };
+
+  active.forEach((r, serial) => {
+    const episode = getMaintenanceEpisode(serial);
+    // Nejnovější záznam epizody (pro techniky a detail)
+    const latestRec = episode.length > 0 ? episode[0] : r;
+    // Nejstarší záznam v epizodě = první "Dán do údržby" = začátek výpadku
+    const oldest = episode.length > 0 ? episode[episode.length - 1] : r;
+    const days = Math.max(
+      0,
+      Math.floor((Date.now() - new Date(`${oldest.date}T00:00:00`)) / 86400000)
+    );
+
+    out[r.type].push({
+      serial,
+      tech: Array.isArray(latestRec.tech) ? latestRec.tech.join(", ") : (latestRec.tech || ""),
+      days,
+      latest: latestRec,
+      episode
+    });
+  });
+
+  out.RS11.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+  out.P40.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+  return out;
+}
+function computeOutOfService() {
+  const det = computeOutOfServiceDetail();
+  return { total: det.RS11.length + det.P40.length, byType: det };
+}
+    function maintPasses(r, q) { const tstr = (q||'').toLowerCase(); if (!tstr) return true; return [r.serial, r.title||'', r.ticket||'', r.tech||''].join(' ').toLowerCase().includes(tstr); }
+
+    function calcDaysSince(dateStr) {
+      if(!dateStr) return 0;
+      const start = new Date(dateStr); start.setHours(0,0,0,0);
+      const today = new Date(); today.setHours(0,0,0,0);
+      return Math.max(0, Math.round((today - start) / 86400000));
+    }
+function renderMaintenance() {
+  const maintFilterType = $('#maintFilterType');
+  const maintSearch = $('#maintSearch');
+  const maintSort = $('#maintSort');
+  const maintList = $('#maintList');
+  const filt = maintFilterType?.value || "ALL";
+  const q = (maintSearch?.value || "").toLowerCase().trim();
+  const sort = maintSort?.value || "SERIAL";
+  const wrap = maintList;
+  wrap.innerHTML = "";
+
+  const det = computeOutOfServiceDetail();
+  const types = ["RS11", "P40"];
+  let any = 0;
+
+  for (const type of types) {
+    if (filt !== "ALL" && filt !== type) continue;
+
+    let arr = (det[type] || []).slice();
+    if (!arr.length) continue;
+
+    if (q) {
+      arr = arr.filter(x => {
+        const hay = [
+          x.serial,
+          x.tech,
+          String(x.days),
+          x.latest?.title,
+          x.latest?.ticket,
+          x.latest?.desc
+        ].join(" ").toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    if (sort === "SERIAL") {
+      arr.sort((a, b) => a.serial.localeCompare(b.serial, "cs", { numeric: true }));
+    } else {
+      arr.sort((a, b) => {
+        const da = new Date(`${a.latest.date}T${a.latest.time || "00:00"}`);
+        const db = new Date(`${b.latest.date}T${b.latest.time || "00:00"}`);
+        return db - da;
+      });
+    }
+
+    if (!arr.length) continue;
+    any += arr.length;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const inner = document.createElement("div");
+    inner.className = "col";
+
+    const head = document.createElement("div");
+    head.className = "section-title";
+    head.innerHTML = `<div><b>${type}</b> <span class="soft">${arr.length} ks</span></div>`;
+    inner.appendChild(head);
+
+    const table = document.createElement("table");
+    table.className = "table";
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>${t('maint_col_serial')}</th>
+          <th>${t('maint_col_tech')}</th>
+          <th>${t('maint_col_days')}</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+    const tb = table.querySelector("tbody");
+
+    arr.forEach(item => {
+      const tr = document.createElement("tr");
+      tr.style.cursor = "pointer";
+      tr.innerHTML = `
+        <td><b>${item.serial}</b></td>
+        <td>${item.tech || ""}</td>
+        <td>${item.days}</td>
+      `;
+
+      const detail = document.createElement("tr");
+      detail.className = "hidden";
+
+      const td = document.createElement("td");
+      td.colSpan = 3;
+      td.innerHTML = `<div class="soft" style="padding:8px 4px 4px"><b>Servisní záznamy</b><div class="col" data-maint-detail="${item.serial}"></div></div>`;
+      detail.appendChild(td);
+
+      tr.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isHidden = detail.classList.toggle("hidden");
+        // Vždy překresli obsah při otevření (ne jen jednou)
+        if (!isHidden) {
+          const box = td.querySelector(`[data-maint-detail="${item.serial}"]`);
+          box.innerHTML = "";
+
+          const episode = item.episode || [];
+
+          if (!episode.length) {
+            box.innerHTML = `<div class="soft" style="padding:6px 0;">${t('maint_no_records')}</div>`;
+            return;
+          }
+
+          episode.forEach(r => {
+            const statusLabel = r.back === false ? "mimo provoz" : r.back === true ? "vrácen" : "";
+            const statusPill = r.back === false
+              ? `<span class="tag" style="background:#2a1620;border-color:#4b2732;color:#fecaca;">${statusLabel}</span>`
+              : r.back === true
+                ? `<span class="tag">${statusLabel}</span>`
+                : "";
+
+            const row = document.createElement("div");
+            row.className = "hist-item";
+            row.style.marginTop = "8px";
+
+            const head = document.createElement("div");
+            head.className = "hist-head";
+            head.innerHTML = `
+              <div class="hist-title">
+                <span class="soft" style="font-weight:400;font-size:12px;">${r.date || ""} ${r.time || ""}</span>
+                ${r.title ? ` — ${r.title}` : ""}
+              </div>
+              <div class="hist-meta">${statusPill}</div>
+            `;
+
+            const body = document.createElement("div");
+            body.className = "hidden";
+            body.style.marginTop = "10px";
+            body.style.fontSize = "13px";
+
+            const lines = [];
+            if (r.ticket)   lines.push(`<div><span class="soft">${t('maint_detail_ticket')}:</span> <b>${r.ticket}</b></div>`);
+            if (r.type)     lines.push(`<div><span class="soft">${t('maint_detail_type')}:</span> ${r.type}</div>`);
+            const tech = Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "");
+            if (tech)       lines.push(`<div><span class="soft">${t('maint_detail_tech')}:</span> ${tech}</div>`);
+            const parts = Array.isArray(r.parts) && r.parts.length
+              ? r.parts.map(p => `${p.name||p.number||p} ${p.qty ? '('+p.qty+'x)' : ''}`).join(", ")
+              : null;
+            if (parts)      lines.push(`<div><span class="soft">${t('maint_detail_parts')}:</span> ${parts}</div>`);
+            if (r.desc)     lines.push(`<div style="margin-top:6px;">${r.desc}</div>`);
+            body.innerHTML = lines.join("");
+
+            head.addEventListener("click", () => body.classList.toggle("hidden"));
+            row.appendChild(head);
+            row.appendChild(body);
+            box.appendChild(row);
+          });
+        }
+      });
+
+      tb.appendChild(tr);
+      tb.appendChild(detail);
+    });
+
+    table.appendChild(tb);
+    inner.appendChild(table);
+    card.appendChild(inner);
+    wrap.appendChild(card);
+  }
+
+  if (!any) {
+    const ok = document.createElement("div");
+    ok.className = "center soft";
+    ok.textContent = "Žádní roboti nejsou mimo provoz.";
+    wrap.appendChild(ok);
+  }
+}
+    function renderParts() {
+      const tb=$('#partsTable tbody'); if(!tb) return; tb.innerHTML='';
+      const q=($('#partsSearch')?.value||'').toLowerCase();
+      const pf=document.querySelector('.pf-btn.pf-active')?.dataset.pf||'ALL';
+      dily.forEach((p,idx)=>{
+        const rt=p.robotType||'Jiné';
+        if(pf!=='ALL'&&rt!==pf) return;
+        if(q&&!((p.name||'').toLowerCase().includes(q)||(p.number||'').toLowerCase().includes(q))) return;
+        const qty=Number.isFinite(p.qty)?p.qty:0;
+        const qCls=qty===0?'qty-low':qty<=2?'qty-warn':'qty-ok';
+        const qW=qty<=2?' ⚠':'';
+        const rtP=rt==='RS11'?'<span class="pill-type pill-rs11">RS11</span>'
+                  :rt==='P40'?'<span class="pill-type pill-p40">P40</span>'
+                             :'<span class="pill-type pill-other">Jiné</span>';
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${p.name||''}</td><td>${p.number||''}</td><td class="right ${qCls}">${qty}${qW}</td><td>${rtP}</td><td>${p.addedDate||''}</td><td>${p.updatedDate||p.addedDate||''}</td><td class="right"><button class="btn" data-plus="${idx}">${t('parts_plus')}</button> <button class="btn" data-edit="${idx}">${t('btn_edit')}</button> <button class="btn danger" data-del="${idx}">${t('btn_delete')}</button></td>`;
+        tb.appendChild(tr);
+      });
+      tb.querySelectorAll('[data-plus]').forEach(b=>b.addEventListener('click',()=>plusPart(Number(b.dataset.plus))));
+      tb.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>editPart(Number(b.dataset.edit))));
+      tb.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>deletePart(Number(b.dataset.del))));
+    }
+    async function persistParts() { await writeJSON('dily.json', dily); refreshKPIs(); populatePartSelect(); }
+    function plusPart(i){
+      const pw = prompt(t('parts_pw_plus'));
+      if (pw === null) return;
+      if (pw !== 'geekminus') { alert(t('parts_pw_wrong')); return; }
+      dily[i].qty = (dily[i].qty||0) + 1; dily[i].updatedDate = (new Date()).toISOString().slice(0,10); persistParts(); renderParts(); populatePartSelect();
+    }
+    function onAddPart() {
+      const name=prompt(LANG==='cs'?'Název dílu:':'Part name:'); if(name===null) return;
+      const number=prompt(LANG==='cs'?'Číslo dílu:':'Part number:'); if(number===null) return;
+      const qtyStr=prompt(LANG==='cs'?'Počet ks:':'Quantity:'); if(qtyStr===null) return;
+      const robotType=prompt(LANG==='cs'?'Typ robota (RS11 / P40 / Jiné):':'Robot type (RS11 / P40 / Other):','Jiné');
+      if(robotType===null) return;
+      const qty=Number(qtyStr); const today=(new Date()).toISOString().slice(0,10);
+      dily.push({name,number,qty:Number.isFinite(qty)?qty:0,robotType:robotType.trim()||'Jiné',addedDate:today,updatedDate:today});
+      persistParts(); renderParts();
+    }
+    function editPart(i) {
+      const pw=prompt(t('parts_pw_edit')); if(pw===null) return;
+      if(pw!=='geekminus'){alert(t('parts_pw_wrong'));return;}
+      const p=dily[i];
+      const name=prompt(LANG==='cs'?'Název dílu:':'Part name:',p.name); if(name===null) return;
+      const number=prompt(LANG==='cs'?'Číslo dílu:':'Part number:',p.number); if(number===null) return;
+      const qtyStr=prompt(LANG==='cs'?'Počet ks:':'Quantity:',p.qty); if(qtyStr===null) return;
+      const robotType=prompt(LANG==='cs'?'Typ robota (RS11 / P40 / Jiné):':'Robot type (RS11 / P40 / Other):',p.robotType||'Jiné');
+      if(robotType===null) return;
+      const qty=Number(qtyStr); const todayU=(new Date()).toISOString().slice(0,10);
+      dily[i]={name,number,qty:Number.isFinite(qty)?qty:0,robotType:robotType.trim()||'Jiné',addedDate:p.addedDate||todayU,updatedDate:todayU};
+      persistParts(); renderParts();
+    }
+    function deletePart(i) {
+      const pw = prompt(t('del_part_confirm'));
+      if (pw === null) return;
+      if (pw !== 'geekminus') { alert(t('del_wrong_pw_part')); return; }
+      dily.splice(i,1); persistParts(); renderParts();
+    }
+
+    function lastStateFor(type, serial){
+      if (!serial) return null;
+      // Hledáme poslední záznam kde back není null (ignorujeme neutrální záznamy)
+      const last = [...servis]
+        .sort((a,b) => tsKey(b).localeCompare(tsKey(a)))
+        .find(r => r.serial === serial && r.type === type && r.back !== null && r.back !== undefined);
+      return last ? last.back : null;
+    }
+    function updateStatusButtons(){
+      const type = $('#srvType').value;
+      const btnBack = $('#srvMarkBack'), btnOut = $('#srvMarkOut');
+      const hintBack = $('#srvMarkBackHint'), hintOut = $('#srvMarkOutHint');
+
+      if (type !== 'RS11' && type !== 'P40') {
+        // Typ "Jiné" – tlačítka normálně dostupná
+        if(btnBack) btnBack.disabled = false;
+        if(btnOut) btnOut.disabled = false;
+        if(hintBack) hintBack.textContent = '';
+        if(hintOut) hintOut.textContent = '';
+        return;
+      }
+
+      if (!selectedSerials.length) {
+        if(btnBack) btnBack.disabled = true;
+        if(btnOut) btnOut.disabled = true;
+        if(hintBack) hintBack.textContent = '';
+        if(hintOut) hintOut.textContent = '';
+        return;
+      }
+
+      // Zjisti stav každého vybraného sériového čísla
+      const states = selectedSerials.map(s => lastStateFor(type, s));
+      // back===false = mimo provoz, back===true = v provozu, null = žádný záznam
+
+      const allOut  = states.every(s => s === false);   // všichni mimo provoz
+      const allBack = states.every(s => s !== false);   // všichni v provozu / bez záznamu
+      const mixed   = !allOut && !allBack;
+
+      // "Vrácen do provozu" – jen pokud jsou VŠICHNI mimo provoz
+      if(btnBack) btnBack.disabled = !allOut;
+      // "Dán do údržby" – jen pokud jsou VŠICHNI v provozu / bez záznamu
+      if(btnOut) btnOut.disabled = !allBack;
+
+      if (hintBack) {
+        if (mixed) hintBack.textContent = '(smíšený stav)';
+        else if (allOut) hintBack.textContent = `(${selectedSerials.length}× mimo provoz)`;
+        else hintBack.textContent = '';
+      }
+      if (hintOut) {
+        if (mixed) hintOut.textContent = '(smíšený stav)';
+        else if (allBack) hintOut.textContent = selectedSerials.length > 1 ? `(${selectedSerials.length}× v provozu)` : '';
+        else hintOut.textContent = '';
+      }
+    }
+
+    function formatUsedParts(r){
+      if (!r.partsUsed || !r.partsUsed.length) {
+        if (Array.isArray(r.parts) && r.parts.length > 0 && typeof r.parts[0] === 'object' && 'partNo' in r.parts[0]) {
+          const filled = r.parts.filter(p => p.partNo || p.partName);
+          if (filled.length > 0) return filled.map(p => `${p.partNo||''}${p.partName ? ' - '+p.partName : ''}`).join('; ');
+        }
+        if (r.partNo || r.partName) {
+          return `${r.partNo||''}${r.partName ? ' - ' + r.partName : ''}`;
+        }
+        return '';
+      }
+      const map = new Map();
+      r.partsUsed.forEach(p => {
+        const key = (p.number||'') + '|' + (p.name||'');
+        map.set(key, (map.get(key)||0) + 1);
+      });
+      return Array.from(map.entries()).map(([k,c]) => {
+        const [num, nam] = k.split('|');
+        return `${num} - ${nam} x${c}`;
+      }).join(', ');
+    }
+    function rowsForExport(){
+      let rows = servis.slice(); // exportuje CELOU historii, ne filtrovanou
+      const sort = ($('#histSort')?$('#histSort').value:'DESC')||'DESC';
+      rows.sort((a,b)=> {
+        const ad = (a.date||'') + ' ' + (a.time||'');
+        const bd = (b.date||'') + ' ' + (b.time||'');
+        return sort==='DESC' ? (bd>ad?1:-1) : (ad>bd?1:-1);
+      });
+      return rows;
+    }
+    function exportXLSX(){
+      const XLSXlib = window.XLSX;
+      if (!XLSXlib){ alert('Soubor xlsx.full.min.js nebyl nalezen v této složce.'); return; }
+      const rows = rowsForExport();
+      if (!rows.length){ alert(LANG==='cs'?'Není co exportovat.':'Nothing to export.'); return; }
+      const headers = t('csv_headers');
+      const data = [headers];
+      const yes = LANG==='cs' ? 'Ano' : 'Yes';
+      const no = LANG==='cs' ? 'Ne' : 'No';
+      rows.forEach((r) => {
+        const usedParts = formatUsedParts(r);
+        data.push([r.date||'', r.time||'', r.type||'', r.serial||'', r.title||'', r.ticket||'', usedParts||'', r.tech||'', (r.back===false)?yes:no, (r.back===true)?yes:no, r.desc||'']);
+      });
+      const ws = XLSXlib.utils.aoa_to_sheet(data);
+      ws['!cols'] = [{wch:12},{wch:8},{wch:10},{wch:16},{wch:28},{wch:14},{wch:28},{wch:18},{wch:16},{wch:18},{wch:48}];
+      ws['!autofilter'] = { ref: `A1:K${data.length}` };
+      const wb = XLSXlib.utils.book_new();
+      XLSXlib.utils.book_append_sheet(wb, ws, LANG==='cs' ? 'Servisní historie' : 'Service history');
+      const ts = new Date().toISOString().slice(0,10);
+      XLSXlib.writeFile(wb, `servisni_historie_${ts}.xlsx`, {compression:true});
+    }
+    async function exportPartsPDF(){
+      if (!dily.length){ alert(LANG==='cs' ? 'Nejsou žádné díly k exportu.' : 'No parts to export.'); return; }
+      const esc = (v) => String(v ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+      const title = LANG==='cs' ? 'Katalog náhradních dílů' : 'Spare parts catalog';
+      const headers = LANG==='cs' ? ['Název','Číslo','Ks','Evidováno','Poslední změna'] : ['Name','Number','Qty','Recorded','Last update'];
+      const rows = [...dily].sort((a,b)=> String(a.name||'').localeCompare(String(b.name||''), LANG==='cs' ? 'cs' : 'en'));
+      const bodyRows = rows.map(p => '<tr>' + [p.name||'', p.number||'', p.qty ?? 0, p.addedAt||'', p.updatedAt||''].map(c => `<td>${esc(c)}</td>`).join('') + '</tr>').join('');
+      const html = `<!doctype html>
+<html lang="${LANG}">
+<head>
+<meta charset="utf-8">
+<title>${esc(title)}</title>
+<style>
+@page { size: A4 landscape; margin: 10mm; }
+body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:0; }
+h1 { font-size: 18px; margin: 0 0 10px; }
+table { width:100%; border-collapse: collapse; table-layout: fixed; font-size: 11px; }
+th, td { border:1px solid #cbd5e1; padding:6px 5px; vertical-align: top; word-break: break-word; overflow-wrap:anywhere; }
+th { background:#f1f5f9; text-align:left; }
+.col-name{width:32%}.col-number{width:20%}.col-qty{width:10%}.col-added{width:19%}.col-updated{width:19%}
+.right{text-align:right}
+</style>
+</head>
+<body>
+<h1>${esc(title)}</h1>
+<table>
+<thead><tr>
+<th class="col-name">${esc(headers[0])}</th>
+<th class="col-number">${esc(headers[1])}</th>
+<th class="col-qty right">${esc(headers[2])}</th>
+<th class="col-added">${esc(headers[3])}</th>
+<th class="col-updated">${esc(headers[4])}</th>
+</tr></thead>
+<tbody>${bodyRows}</tbody>
+</table>
+<script>window.onload = () => { setTimeout(() => window.print(), 200); }<\/script>
+</body>
+</html>`;
+      const w = window.open('', '_blank', 'width=1400,height=900');
+      if (!w) { alert(LANG==='cs' ? 'Pro export PDF povol v prohlížeči vyskakovací okna.' : 'Please allow popups for PDF export.'); return; }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    }
+
+function exportPDF(){
+      const rows = rowsForExport();
+      if (!rows.length){ alert(LANG==='cs'?'Není co exportovat.':'Nothing to export.'); return; }
+      const headers = t('csv_headers');
+      const yes = LANG==='cs' ? 'Ano' : 'Yes';
+      const no = LANG==='cs' ? 'Ne' : 'No';
+      const esc = (v) => String(v ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+      const bodyRows = rows.map((r) => {
+        const ticketCell = r.ticketLink
+          ? `<td>${esc(r.ticket||'')}<br><a href="${esc(r.ticketLink)}" style="color:#2563eb;font-size:9px;word-break:break-all">${esc(r.ticketLink)}</a></td>`
+          : `<td>${esc(r.ticket||'')}</td>`;
+        const cols = [
+          r.date||'', r.time||'', r.type||'', r.serial||'', r.title||'',
+          '__TICKET__',
+          formatUsedParts(r)||'', r.tech||'', r.back===false ? yes : no, r.back===true ? yes : no, r.desc||''
+        ];
+        return '<tr>' + cols.map(c => c==='__TICKET__' ? ticketCell : `<td>${esc(c)}</td>`).join('') + '</tr>';
+      }).join('');
+      const title = LANG==='cs' ? 'Servisní historie' : 'Service history';
+      const html = `<!doctype html>
+<html lang="${LANG}">
+<head>
+<meta charset="utf-8">
+<title>${esc(title)}</title>
+<style>
+@page { size: A4 landscape; margin: 10mm; }
+body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:0; }
+h1 { font-size: 18px; margin: 0 0 10px; }
+table { width:100%; border-collapse: collapse; table-layout: fixed; font-size: 10px; }
+th, td { border:1px solid #cbd5e1; padding:6px 5px; vertical-align: top; word-break: break-word; overflow-wrap:anywhere; }
+th { background:#f1f5f9; text-align:left; }
+.col-date{width:8%}.col-time{width:6%}.col-type{width:6%}.col-serial{width:8%}.col-title{width:14%}.col-ticket{width:10%}.col-parts{width:15%}.col-tech{width:11%}.col-out{width:8%}.col-back{width:8%}.col-desc{width:16%}
+</style>
+</head>
+<body>
+<h1>${esc(title)}</h1>
+<table>
+<thead><tr>
+<th class="col-date">${esc(headers[0])}</th>
+<th class="col-time">${esc(headers[1])}</th>
+<th class="col-type">${esc(headers[2])}</th>
+<th class="col-serial">${esc(headers[3])}</th>
+<th class="col-title">${esc(headers[4])}</th>
+<th class="col-ticket">${esc(headers[5])}</th>
+<th class="col-parts">${esc(headers[6])}</th>
+<th class="col-tech">${esc(headers[7])}</th>
+<th class="col-out">${esc(headers[8])}</th>
+<th class="col-back">${esc(headers[9])}</th>
+<th class="col-desc">${esc(headers[10])}</th>
+</tr></thead>
+<tbody>${bodyRows}</tbody>
+</table>
+<script>window.onload = () => { setTimeout(() => window.print(), 200); }<\/script>
+</body>
+</html>`;
+      const w = window.open('', '_blank', 'width=1400,height=900');
+      if (!w) { alert(LANG==='cs' ? 'Pro export PDF povol v prohlížeči vyskakovací okna.' : 'Please allow popups for PDF export.'); return; }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    }
+
+    (function init() {
+      bindGoto();
+      $('#homeLink').addEventListener('click', ()=> goto('secHome'));
+      async function openCloud(state) {
+        dataDir = new TicketCloud.Directory();
+        servis = state.servis; dily = state.dily;
+        $('#pickedInfo').textContent = 'OneDrive • připojeno';
+        $('#pickData').classList.remove('hidden');
+        $('#topNav').classList.remove('hidden');
+        $('#secGate').classList.add('hidden');
+        populateTechFilter(); renderServisList(); renderParts(); populatePartSelect();
+        resetPartRows(); renderMaintenance(); refreshKPIs();
+        const n = niceNow(); $('#srvDate').value=n.date; $('#srvTime').value=n.time;
+        $('#srvType').value='Jiné'; rebuildSerials(); resetFormOnlyPhotos();
+        goto('secHome');
+      }
+      $('#cloudLogin').addEventListener('submit', async event => {
+        event.preventDefault();
+        $('#gatePick').disabled=true; $('#cloudError').textContent='';
+        try {
+          const state=await TicketCloud.login($('#cloudPassword').value);
+          $('#cloudPassword').value='';
+          await openCloud(state);
+        } catch(error) {$('#cloudError').textContent=error.message;}
+        finally {$('#gatePick').disabled=false;}
+      });
+      TicketCloud.resume().then(state => state && openCloud(state))
+        .catch(error => {$('#cloudError').textContent=error.message;});
+      window.addEventListener('unhandledrejection',event=>{
+        event.preventDefault();
+        alert((event.reason?.message || 'Cloud nepotvrdil operaci.') + '\nPřed dalším ukládáním obnov stránku.');
+      });
+
+      document.body.setAttribute('data-theme', 'dark');
+      $('#themeToggle').textContent = document.body.getAttribute('data-theme')==='light' ? '🌞' : '🌙';
+      $('#themeToggle').addEventListener('click', ()=>{
+        const cur = document.body.getAttribute('data-theme')==='light' ? 'dark' : 'light';
+        document.body.setAttribute('data-theme', cur);
+        $('#themeToggle').textContent = cur==='light' ? '🌞' : '🌙';
+      });
+      $('#langSelect').value = LANG;
+      $('#langSelect').addEventListener('change', (e)=> setLang(e.target.value));
+      applyI18n();
+
+      $('#pickData').addEventListener('click', () => {TicketCloud.logout();location.reload();});
+
+      $('#srvType').addEventListener('change', rebuildSerials);
+      // Multi-select toggle otevřít/zavřít
+      const serialToggle = $('#srvSerialToggle');
+      const serialDropdown = $('#srvSerialDropdown');
+      if (serialToggle) {
+        serialToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          serialDropdown.classList.toggle('hidden');
+          if (!serialDropdown.classList.contains('hidden')) {
+            $('#srvSerialSearch').value = '';
+            renderSerialList('');
+            setTimeout(() => $('#srvSerialSearch').focus(), 50);
+          }
+        });
+      }
+      // Hledání v dropdownu
+      const serialSearch = $('#srvSerialSearch');
+      if (serialSearch) {
+        serialSearch.addEventListener('input', () => renderSerialList(serialSearch.value));
+        serialSearch.addEventListener('click', e => e.stopPropagation());
+      }
+      // Vybrat vše / Žádné
+      const selAll = $('#srvSerialSelAll');
+      const selNone = $('#srvSerialSelNone');
+      if (selAll) selAll.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = $('#srvType').value;
+        selectedSerials = type==='RS11' ? [...RS11] : type==='P40' ? [...P40] : [];
+        renderSerialList($('#srvSerialSearch').value||'');
+        updateSerialDisplay(); updateStatusButtons();
+      });
+      if (selNone) selNone.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedSerials = [];
+        renderSerialList($('#srvSerialSearch').value||'');
+        updateSerialDisplay(); updateStatusButtons();
+      });
+      // Zavřít dropdown kliknutím mimo
+      document.addEventListener('click', (e) => {
+        if (serialDropdown && !$('#srvSerialMultiWrap').contains(e.target)) {
+          serialDropdown.classList.add('hidden');
+        }
+      });
+
+      // Technik multi-select
+      const techToggle = $('#srvTechToggle');
+      const techDropdown = $('#srvTechDropdown');
+      if (techToggle) {
+        techToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Refresh seznamu při otevření (mohou být nová jména z dat)
+          if (techDropdown.classList.contains('hidden')) {
+            renderTechList();
+          }
+          techDropdown.classList.toggle('hidden');
+        });
+      }
+      // Zavřít Technik dropdown kliknutím mimo
+      document.addEventListener('click', (e) => {
+        if (techDropdown && !$('#srvTechMultiWrap').contains(e.target)) {
+          techDropdown.classList.add('hidden');
+        }
+      });
+
+      $('#srvPickPhotos').addEventListener('click', async () => {
+        try {
+          const pickedPhotos = await window.showOpenFilePicker({ multiple: true, types: [{ description: 'Obrázky', accept: { 'image/*':['.png','.jpg','.jpeg','.webp'] } }] });
+          photoHandles = [...photoHandles, ...pickedPhotos];
+          $('#srvPhotoCount').textContent = filesCountStr(photoHandles.length); await renderPickedPreviews();
+        } catch(e) {}
+      });
+      $('#srvPickFiles').addEventListener('click', async ()=>{
+        try {
+          const picked = await window.showOpenFilePicker({ multiple:true });
+          fileHandles = [...fileHandles, ...picked];
+          $('#srvFileCount').textContent = filesCountStr(fileHandles.length);
+          renderPickedFiles();
+        } catch(e){}
+      });
+      $('#srvSave').addEventListener('click', saveServisRecord);
+      $('#srvCancelEdit').addEventListener('click', cancelEdit);
+      // Tlačítko přidat díl
+      const srvAddPartBtn = $('#srvAddPart');
+      if (srvAddPartBtn) srvAddPartBtn.addEventListener('click', () => {
+        createPartRow({});
+      });
+      $('#exportCSV').addEventListener('click', exportCSV);
+      $('#exportPrint').addEventListener('click', ()=> { document.querySelectorAll('#srvList .hidden').forEach(el => el.classList.add('print-open')); document.querySelectorAll('#srvList .print-open').forEach(el => el.classList.remove('hidden')); setTimeout(()=> window.print(), 50); });
+      $('#exportXLSX').addEventListener('click', exportXLSX);
+      $('#exportPDF').addEventListener('click', exportPDF);
+      $('#exportPartsPDF').addEventListener('click', exportPartsPDF);
+
+      $('#maintFilterType').addEventListener('change', renderMaintenance);
+
+      $('#srvMarkBack').addEventListener('click', ()=>{ if ($('#srvMarkBack').disabled) return; srvStatus = (srvStatus==='back'?'none':'back'); $('#srvMarkBack').classList.toggle('primary', srvStatus==='back'); if (srvStatus==='back') $('#srvMarkOut').classList.remove('primary'); });
+      $('#srvMarkOut').addEventListener('click', ()=>{ if ($('#srvMarkOut').disabled) return; srvStatus = (srvStatus==='out'?'none':'out'); $('#srvMarkOut').classList.toggle('primary', srvStatus==='out'); if (srvStatus==='out') $('#srvMarkBack').classList.remove('primary'); });
+
+      window.addEventListener('afterprint', ()=> { document.querySelectorAll('#srvList .print-open').forEach(el => { el.classList.add('hidden'); el.classList.remove('print-open'); }); });
+      window.addEventListener('beforeprint', ()=> { document.querySelectorAll('#srvList .hidden').forEach(el => el.classList.add('print-open')); document.querySelectorAll('#srvList .print-open').forEach(el => el.classList.remove('hidden')); });
+      bindGoto();
+      updateStatusButtons();
+    })();
+  </script>
+  <script defer src="jspdf.umd.min.js"></script>
+  <script defer src="xlsx.full.min.js"></script>
+</body>
+</html>
