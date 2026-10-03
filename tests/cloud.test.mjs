@@ -43,3 +43,16 @@ test('cloud HTML scripts compile and preserves edited serial multi-select',async
   const original=await readFile(new URL('../index.html',import.meta.url),'utf8');
   assert.ok(original.includes('showDirectoryPicker'));
 });
+
+test('cloud escapes record text and rejects script URLs',async()=>{
+  const html=await readFile(new URL('../cloud.html',import.meta.url),'utf8');
+  const start=html.indexOf('    function htmlText('),end=html.indexOf('    let cloudSaving',start);
+  const context={URL};
+  vm.createContext(context);
+  vm.runInContext(html.slice(start,end),context);
+  assert.equal(context.htmlText('<img onerror="alert(1)">'), '&lt;img onerror=&quot;alert(1)&quot;&gt;');
+  assert.equal(context.safeTicketURL('javascript:alert(1)'), '');
+  assert.equal(context.safeTicketURL('https://example.com/ticket'), 'https://example.com/ticket');
+  assert.ok(html.includes('htmlText(r.title)'));
+  assert.ok(html.includes('htmlText(r.desc)'));
+});

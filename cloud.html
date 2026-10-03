@@ -712,6 +712,14 @@
       return { date: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}` };
     }
 
+    function htmlText(value) {
+      return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;')
+        .replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+    }
+    function safeTicketURL(value) {
+      try { const url=new URL(value); return /^https?:$/.test(url.protocol)?htmlText(url.href):''; }
+      catch { return ''; }
+    }
     let cloudSaving = false;
     async function ensureJSON(name) { return TicketCloud.initial(name); }
     async function writeJSON(name, obj) {
@@ -784,7 +792,7 @@
       }
       rows.forEach(r=>{
         const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${r.name}</td><td>${r.number}</td><td>${r.date}</td><td>${r.tech}</td><td class="right">1</td><td>${r.serial}</td>`;
+        tr.innerHTML=`<td>${htmlText(r.name)}</td><td>${htmlText(r.number)}</td><td>${htmlText(r.date)}</td><td>${htmlText(r.tech)}</td><td class="right">1</td><td>${htmlText(r.serial)}</td>`;
         tb.appendChild(tr);
       });
     }
@@ -946,7 +954,7 @@
                               : days>0 ? `<span class="badge-ok">${LANG==='cs'?'Dobrá':'Good'}</span>`
                               : `<span class="badge-ok">${LANG==='cs'?'V provozu':'Running'}</span>`;
         const tr = document.createElement('tr');
-        tr.innerHTML=`<td><b>${robot}</b></td><td>${count}</td><td>${days}</td><td class="muted">${top}</td><td>${badge}</td>`;
+        tr.innerHTML=`<td><b>${htmlText(robot)}</b></td><td>${count}</td><td>${days}</td><td class="muted">${htmlText(top)}</td><td>${badge}</td>`;
         tb.appendChild(tr);
       });
     }
@@ -1101,7 +1109,7 @@
         else String(val).split(',').forEach(v => { if (v.trim()) techSet.add(v.trim()); });
       });
       const techs = Array.from(techSet).sort((a, b) => a.localeCompare(b, 'cs'));
-      sel.innerHTML = `<option value="ALL">${t('filter_all_tech')}</option>` + techs.map(v => `<option value="${v}">${v}</option>`).join('');
+      sel.innerHTML = `<option value="ALL">${t('filter_all_tech')}</option>` + techs.map(v => `<option value="${htmlText(v)}">${htmlText(v)}</option>`).join('');
     }
     function passesHistFilters(r) {
       const q = ($('#histSearch')?.value||'').toLowerCase();
@@ -1518,7 +1526,7 @@
         const f = await h.getFile(); const url = URL.createObjectURL(f);
         const wrap = document.createElement('div'); wrap.className = 'thumb-wrap';
         const img = document.createElement('img'); img.src = url; img.title = f.name;
-        img.addEventListener('click', ()=> window.open(url, '_blank'));
+        img.addEventListener('click', ()=> window.open(url, '_blank', 'noopener,noreferrer'));
         const btn = document.createElement('button'); btn.className = 'thumb-remove'; btn.innerHTML = '&times;'; btn.title = LANG==='cs'?'Odebrat':'Remove';
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1844,9 +1852,9 @@ function renderServisList() {
         const item = document.createElement('div'); item.className = 'hist-item';
         const head = document.createElement('div'); head.className = 'hist-head';
         head.innerHTML = `
-          <div class="hist-title"><span class="pill">${r.type}${r.serial ? ' · ' + r.serial : ''}</span> ${r.title || '(bez názvu)'}</div>
+          <div class="hist-title"><span class="pill">${htmlText(r.type)}${r.serial ? ' · ' + htmlText(r.serial) : ''}</span> ${htmlText(r.title || '(bez názvu)')}</div>
           <div class="hist-meta">
-            <span class="soft">${r.date} ${r.time}</span>
+            <span class="soft">${htmlText(r.date)} ${htmlText(r.time)}</span>
             ${r.back===false ? daysBadge(r._days) : ''}
             ${r.back===true ? '<span class="tag">'+t('tag_returned')+'</span>' : (r.back===false ? '<span class="tag" style="background:#2a1620;border-color:#4b2732;color:#fecaca;">'+t('tag_out')+'</span>' : '')}
           </div>`;
@@ -1898,22 +1906,22 @@ function renderServisList() {
         const meta = document.createElement('div'); meta.innerHTML = `
           <div class="divider"></div>
           <div class="grid">
-            <div class="ticket-row" style="display:flex;gap:8px;align-items:center;"><b>Ticket:</b> <span>${r.ticket || '<span class="soft">—</span>'}</span>${r.ticketLink ? `<a class="ticket-link-icon" href="${r.ticketLink}" target="_blank" rel="noopener noreferrer" title="Otevřít Geek ticket" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;border:1px solid var(--border);background:var(--btn-bg);color:var(--accent);text-decoration:none;flex-shrink:0;"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg></a>` : ''}</div>
+            <div class="ticket-row" style="display:flex;gap:8px;align-items:center;"><b>Ticket:</b> <span>${r.ticket ? htmlText(r.ticket) : '<span class="soft">—</span>'}</span>${r.ticketLink ? `<a class="ticket-link-icon" href="${safeTicketURL(r.ticketLink)}" target="_blank" rel="noopener noreferrer" title="Otevřít Geek ticket" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;border:1px solid var(--border);background:var(--btn-bg);color:var(--accent);text-decoration:none;flex-shrink:0;"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg></a>` : ''}</div>
             <div><b>${LANG==='cs'?'Díly':'Parts'}:</b> ${
             (() => {
               // Nový formát: r.parts = [{ partNo, partName }, ...]
               if (Array.isArray(r.parts) && r.parts.length > 0 && typeof r.parts[0] === 'object' && 'partNo' in r.parts[0]) {
                 const filled = r.parts.filter(p => p.partNo || p.partName);
                 return filled.length > 0
-                  ? filled.map(p => `<span class="chip">${p.partNo ? p.partNo + (p.partName ? ' – ' + p.partName : '') : p.partName}</span>`).join(' ')
+                  ? filled.map(p => `<span class="chip">${htmlText(p.partNo ? p.partNo + (p.partName ? ' – ' + p.partName : '') : p.partName)}</span>`).join(' ')
                   : '<span class="soft">—</span>';
               }
               // Starý formát
-              return r.partNo ? `<span class="chip">${r.partNo}${r.partName ? ' – ' + r.partName : ''}</span>` : '<span class="soft">—</span>';
+              return r.partNo ? `<span class="chip">${htmlText(r.partNo)}${r.partName ? ' – ' + htmlText(r.partName) : ''}</span>` : '<span class="soft">—</span>';
             })()
           }</div>
-            <div><b>Technik:</b> ${(() => { const a = Array.isArray(r.tech) ? r.tech : (r.tech ? [r.tech] : []); const ext = r.extTech ? ['<em>'+r.extTech+'</em>'] : []; const all = [...a, ...ext].filter(Boolean); return all.length ? all.join(', ') : '<span class="soft">—</span>'; })()}</div>
-            <div class="soft">Složka: ${r.id}</div>
+            <div><b>Technik:</b> ${(() => { const a = Array.isArray(r.tech) ? r.tech : (r.tech ? [r.tech] : []); const ext = r.extTech ? ['<em>'+htmlText(r.extTech)+'</em>'] : []; const all = [...a.map(htmlText), ...ext].filter(Boolean); return all.length ? all.join(', ') : '<span class="soft">—</span>'; })()}</div>
+            <div class="soft">Složka: ${htmlText(r.id)}</div>
           </div>
           <div class="divider"></div>
           <div>${(r.desc || '').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\n','<br>')}</div>
@@ -1973,7 +1981,7 @@ function getMaintenanceEpisode(serial) {
   return rows.slice(0, startIndex + 1);
 }    
 function tsKey(r) {
-  return `${r.date || ""} ${r.time || ""}`;
+  return `${htmlText(r.date || "")} ${htmlText(r.time || "")}`;
 }
 
 function sortNewestFirst(a, b) {
@@ -2114,8 +2122,8 @@ function renderMaintenance() {
       const tr = document.createElement("tr");
       tr.style.cursor = "pointer";
       tr.innerHTML = `
-        <td><b>${item.serial}</b></td>
-        <td>${item.tech || ""}</td>
+        <td><b>${htmlText(item.serial)}</b></td>
+        <td>${htmlText(item.tech || "")}</td>
         <td>${item.days}</td>
       `;
 
@@ -2124,7 +2132,7 @@ function renderMaintenance() {
 
       const td = document.createElement("td");
       td.colSpan = 3;
-      td.innerHTML = `<div class="soft" style="padding:8px 4px 4px"><b>Servisní záznamy</b><div class="col" data-maint-detail="${item.serial}"></div></div>`;
+      td.innerHTML = `<div class="soft" style="padding:8px 4px 4px"><b>Servisní záznamy</b><div class="col" data-maint-detail="${htmlText(item.serial)}"></div></div>`;
       detail.appendChild(td);
 
       tr.addEventListener("click", (e) => {
@@ -2132,7 +2140,7 @@ function renderMaintenance() {
         const isHidden = detail.classList.toggle("hidden");
         // Vždy překresli obsah při otevření (ne jen jednou)
         if (!isHidden) {
-          const box = td.querySelector(`[data-maint-detail="${item.serial}"]`);
+          const box = td.querySelector(".col");
           box.innerHTML = "";
 
           const episode = item.episode || [];
@@ -2158,8 +2166,8 @@ function renderMaintenance() {
             head.className = "hist-head";
             head.innerHTML = `
               <div class="hist-title">
-                <span class="soft" style="font-weight:400;font-size:12px;">${r.date || ""} ${r.time || ""}</span>
-                ${r.title ? ` — ${r.title}` : ""}
+                <span class="soft" style="font-weight:400;font-size:12px;">${htmlText(r.date || "")} ${htmlText(r.time || "")}</span>
+                ${r.title ? ` — ${htmlText(r.title)}` : ""}
               </div>
               <div class="hist-meta">${statusPill}</div>
             `;
@@ -2170,15 +2178,15 @@ function renderMaintenance() {
             body.style.fontSize = "13px";
 
             const lines = [];
-            if (r.ticket)   lines.push(`<div><span class="soft">${t('maint_detail_ticket')}:</span> <b>${r.ticket}</b></div>`);
-            if (r.type)     lines.push(`<div><span class="soft">${t('maint_detail_type')}:</span> ${r.type}</div>`);
+            if (r.ticket)   lines.push(`<div><span class="soft">${t('maint_detail_ticket')}:</span> <b>${htmlText(r.ticket)}</b></div>`);
+            if (r.type)     lines.push(`<div><span class="soft">${t('maint_detail_type')}:</span> ${htmlText(r.type)}</div>`);
             const tech = Array.isArray(r.tech) ? r.tech.join(", ") : (r.tech || "");
-            if (tech)       lines.push(`<div><span class="soft">${t('maint_detail_tech')}:</span> ${tech}</div>`);
+            if (tech)       lines.push(`<div><span class="soft">${t('maint_detail_tech')}:</span> ${htmlText(tech)}</div>`);
             const parts = Array.isArray(r.parts) && r.parts.length
               ? r.parts.map(p => `${p.name||p.number||p} ${p.qty ? '('+p.qty+'x)' : ''}`).join(", ")
               : null;
-            if (parts)      lines.push(`<div><span class="soft">${t('maint_detail_parts')}:</span> ${parts}</div>`);
-            if (r.desc)     lines.push(`<div style="margin-top:6px;">${r.desc}</div>`);
+            if (parts)      lines.push(`<div><span class="soft">${t('maint_detail_parts')}:</span> ${htmlText(parts)}</div>`);
+            if (r.desc)     lines.push(`<div style="margin-top:6px;">${htmlText(r.desc)}</div>`);
             body.innerHTML = lines.join("");
 
             head.addEventListener("click", () => body.classList.toggle("hidden"));
@@ -2221,7 +2229,7 @@ function renderMaintenance() {
                   :rt==='P40'?'<span class="pill-type pill-p40">P40</span>'
                              :'<span class="pill-type pill-other">Jiné</span>';
         const tr=document.createElement('tr');
-        tr.innerHTML=`<td>${p.name||''}</td><td>${p.number||''}</td><td class="right ${qCls}">${qty}${qW}</td><td>${rtP}</td><td>${p.addedDate||''}</td><td>${p.updatedDate||p.addedDate||''}</td><td class="right"><button class="btn" data-plus="${idx}">${t('parts_plus')}</button> <button class="btn" data-edit="${idx}">${t('btn_edit')}</button> <button class="btn danger" data-del="${idx}">${t('btn_delete')}</button></td>`;
+        tr.innerHTML=`<td>${htmlText(p.name||'')}</td><td>${htmlText(p.number||'')}</td><td class="right ${qCls}">${qty}${qW}</td><td>${rtP}</td><td>${htmlText(p.addedDate||'')}</td><td>${htmlText(p.updatedDate||p.addedDate||'')}</td><td class="right"><button class="btn" data-plus="${idx}">${t('parts_plus')}</button> <button class="btn" data-edit="${idx}">${t('btn_edit')}</button> <button class="btn danger" data-del="${idx}">${t('btn_delete')}</button></td>`;
         tb.appendChild(tr);
       });
       tb.querySelectorAll('[data-plus]').forEach(b=>b.addEventListener('click',()=>plusPart(Number(b.dataset.plus))));
@@ -2436,7 +2444,7 @@ function exportPDF(){
         .replaceAll("'",'&#39;');
       const bodyRows = rows.map((r) => {
         const ticketCell = r.ticketLink
-          ? `<td>${esc(r.ticket||'')}<br><a href="${esc(r.ticketLink)}" style="color:#2563eb;font-size:9px;word-break:break-all">${esc(r.ticketLink)}</a></td>`
+          ? `<td>${esc(r.ticket||'')}<br><a href="${safeTicketURL(r.ticketLink)}" style="color:#2563eb;font-size:9px;word-break:break-all">${safeTicketURL(r.ticketLink)}</a></td>`
           : `<td>${esc(r.ticket||'')}</td>`;
         const cols = [
           r.date||'', r.time||'', r.type||'', r.serial||'', r.title||'',
