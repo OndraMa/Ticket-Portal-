@@ -2101,7 +2101,7 @@ function renderMaintenance() {
 
     const head = document.createElement("div");
     head.className = "section-title";
-    head.innerHTML = `<div><b>${type}</b> <span class="soft">${arr.length} ks</span></div>`;
+    head.innerHTML = `<div><b>${htmlText(type)}</b> <span class="soft">${arr.length} ks</span></div>`;
     inner.appendChild(head);
 
     const table = document.createElement("table");
