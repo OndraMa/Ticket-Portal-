@@ -34,6 +34,8 @@ test('cloud HTML scripts compile and preserves edited serial multi-select',async
   for(const [,code] of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) if(code.trim()) new vm.Script(code);
   new vm.Script(await readFile(new URL('../cloud/adapter.js',import.meta.url),'utf8'));
   assert.ok(!html.includes('showDirectoryPicker'));
+  assert.ok(!html.includes('showOpenFilePicker'));
+  assert.ok(html.includes("TicketCloud.pickFiles('image/*')"));
   assert.ok(html.includes("serialList = (type==='RS11'||type==='P40') ? [...selectedSerials] : ['']"));
   assert.ok(html.includes('async function saveServisRecordCloud()'));
   assert.ok(html.includes('async function saveServisRecord()'));

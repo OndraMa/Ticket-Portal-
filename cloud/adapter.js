@@ -83,7 +83,17 @@ window.TicketCloud = (() => {
       await api('/api/directory?path='+encodeURIComponent(name),{method:'DELETE'});
     }
   }
-  return {login,resume,logout,save,Directory,
+  function pickFiles(accept='') {
+    return new Promise(resolve=>{
+      const input=document.createElement('input');
+      input.type='file';input.multiple=true;input.accept=accept;input.hidden=true;
+      const done=files=>{input.remove();resolve(Array.from(files, file=>({name:file.name,getFile:async()=>file})));};
+      input.addEventListener('change',()=>done(input.files),{once:true});
+      input.addEventListener('cancel',()=>done([]),{once:true});
+      document.body.appendChild(input);input.click();
+    });
+  }
+  return {login,resume,logout,save,Directory,pickFiles,
     initial(name){return structuredClone(name==='servisni.json'?snapshot.servis:snapshot.dily);},
     previous(){return structuredClone(snapshot);}
   };

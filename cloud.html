@@ -601,7 +601,7 @@
         maint_title: "Roboti mimo provoz", maint_filter: "Filtrovat:", maint_all: "Vše", maint_search: "Hledat", maint_search_ph: "sériové / název / ticket / technik...", maint_sort_label: "Řazení", maint_sort_serial: "Podle sériového čísla", maint_sort_date: "Podle data (nejnovější)", maint_ks: "ks",
         csv_headers: ["Datum","Čas","Typ","Sériové číslo","Nadpis","Ticket","Použité díly","Technik","Vyřazen z provozu","Vrácen do provozu","Popis"],
         L_out: "Vyřazen z provozu", L_returned: "Vrácen do provozu",
-        alert_saved: "Záznam uložen.", alert_updated: "Záznam upraven.", files_count: (n) => `${n} souborů`, alert_folder_pick_fail: "Výběr složky byl zrušen nebo selhal.", alert_choose_data: "Nejprve zvolte složku /data.", alert_no_stock: "Na skladě už není žádný kus tohoto dílu.",
+        alert_saved: "Záznam uložen.", alert_updated: "Záznam upraven.", files_count: (n) => `${n} souborů`, alert_folder_pick_fail: "Výběr složky byl zrušen nebo selhal.", alert_choose_data: "Nejprve se přihlas do portálu.", alert_no_stock: "Na skladě už není žádný kus tohoto dílu.",
         form_ext_tech: "Externí technik",
         form_title_new: "Nový servisní záznam",
         form_title_edit: "Upravit servisní záznam",
@@ -662,7 +662,7 @@
         maint_title: "Robots out of service", maint_filter: "Filter:", maint_all: "All", maint_search: "Search", maint_search_ph: "serial / title / ticket / technician...", maint_sort_label: "Sort", maint_sort_serial: "By serial number", maint_sort_date: "By date (newest)", maint_ks: "pcs",
         csv_headers: ["Date","Time","Type","Serial","Title","Ticket","Used parts","Technician","Out of service","Returned to service","Description"],
         L_out: "Out of service", L_returned: "Returned to service",
-        alert_saved: "Record saved.", alert_updated: "Record updated.", files_count: (n) => `${n} files`, alert_folder_pick_fail: "Folder selection was canceled or failed.", alert_choose_data: "Pick the /data folder first.", alert_no_stock: "No stock left for this part.",
+        alert_saved: "Record saved.", alert_updated: "Record updated.", files_count: (n) => `${n} files`, alert_folder_pick_fail: "Folder selection was canceled or failed.", alert_choose_data: "Sign in to the portal first.", alert_no_stock: "No stock left for this part.",
         form_ext_tech: "External technician",
         form_title_new: "New service record",
         form_title_edit: "Edit service record",
@@ -2601,14 +2601,14 @@ th { background:#f1f5f9; text-align:left; }
 
       $('#srvPickPhotos').addEventListener('click', async () => {
         try {
-          const pickedPhotos = await window.showOpenFilePicker({ multiple: true, types: [{ description: 'Obrázky', accept: { 'image/*':['.png','.jpg','.jpeg','.webp'] } }] });
+          const pickedPhotos = await TicketCloud.pickFiles('image/*');
           photoHandles = [...photoHandles, ...pickedPhotos];
           $('#srvPhotoCount').textContent = filesCountStr(photoHandles.length); await renderPickedPreviews();
         } catch(e) {}
       });
       $('#srvPickFiles').addEventListener('click', async ()=>{
         try {
-          const picked = await window.showOpenFilePicker({ multiple:true });
+          const picked = await TicketCloud.pickFiles();
           fileHandles = [...fileHandles, ...picked];
           $('#srvFileCount').textContent = filesCountStr(fileHandles.length);
           renderPickedFiles();

@@ -147,7 +147,7 @@ export class Portal {
       const current=await this.readState();
       if(!equal(request.headers.get('X-Portal-Version')||'',current.version)) this.fail('Jiný kolega mezitím změnil data. Obnov portál a zopakuj změnu.',409);
       const response=await this.graph(':/portal-state.json:/content',{method:'PUT',
-        headers:{'Content-Type':'application/json',...(current.version==='missing'?{}:{'If-Match':current.version})},
+        headers:{'Content-Type':'application/json',...(current.version==='missing'?{'If-None-Match':'*'}:{'If-Match':current.version})},
         body:JSON.stringify({schema:1,servis:value.servis,dily:value.dily})});
       const item=await response.json();
       return json({version:item.eTag});
