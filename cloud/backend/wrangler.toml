@@ -1,0 +1,17 @@
+name = "ticketportal-onedrive"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+PORTAL_ORIGIN = "https://ondrama.github.io"
+PUBLIC_URL = "https://REPLACE.workers.dev"
+MS_CLIENT_ID = "REPLACE_WITH_APPLICATION_CLIENT_ID"
+
+[[durable_objects.bindings]]
+name = "PORTAL"
+class_name = "Portal"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Portal"]

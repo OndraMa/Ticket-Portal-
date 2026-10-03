@@ -1,0 +1,20 @@
+name: Cloud version checks
+on:
+  push:
+    branches: ["work/onedrive-cloud-no-turnstile"]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test tests/serial-edit.test.cjs tests/cloud.test.mjs
+      - run: npm install
+        working-directory: cloud/backend
+      - run: npx wrangler deploy --dry-run
+        working-directory: cloud/backend

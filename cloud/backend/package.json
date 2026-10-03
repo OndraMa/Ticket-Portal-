@@ -1,0 +1,12 @@
+{
+  "name": "ticketportal-onedrive",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "test": "node --test ../../tests/cloud.test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
